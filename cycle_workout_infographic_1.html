@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I Workout According To My Cycle · Sanyuja</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #06040f;
+      font-family: 'Inter', sans-serif;
+      color: #f0eaf8;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .moon-glow {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, #fffae0, #f5c842, #b87a08);
+      margin: 0 auto 20px;
+      box-shadow: 0 0 50px 16px rgba(245,200,66,0.38), 0 0 100px 36px rgba(200,130,10,0.16);
+      animation: moonPulse 4s ease-in-out infinite;
+    }
+    @keyframes moonPulse {
+      0%,100% { box-shadow: 0 0 50px 16px rgba(245,200,66,0.38), 0 0 100px 36px rgba(200,130,10,0.16); }
+      50%      { box-shadow: 0 0 72px 26px rgba(245,200,66,0.55), 0 0 140px 55px rgba(200,130,10,0.28); }
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.7rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f5c842, #e8a0bf, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .byline {
+      font-size: 0.82rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #7c6fa0;
+      margin-bottom: 14px;
+    }
+
+    .header .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: #c4b5e8;
+      margin-bottom: 20px;
+    }
+
+    .header .intro {
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 0.93rem;
+      line-height: 1.8;
+      color: #a89cc8;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle var(--dur) ease-in-out infinite var(--delay);
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0.08; transform: scale(1); }
+      50%      { opacity: 0.55; transform: scale(1.4); }
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 44px 0;
+      color: rgba(167,139,250,0.35);
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(167,139,250,0.3));
+    }
+    .divider::after { transform: scaleX(-1); }
+
+    .moon-section {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(245,200,66,0.15);
+      border-radius: 20px;
+      padding: 36px 32px;
+      margin-bottom: 48px;
+    }
+
+    .moon-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: #f5c842;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .moon-section-sub {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #7c6fa0;
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+
+    .moon-phases-row {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .moon-phase {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .moon-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 6px rgba(245,200,66,0.3));
+    }
+
+    .moon-day {
+      font-size: 0.62rem;
+      color: #6b5f8a;
+      letter-spacing: 0.5px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .moon-name {
+      font-size: 0.6rem;
+      color: #9b8bbf;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .moon-phase-bar {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+    }
+
+    .moon-bar-segment {
+      height: 6px;
+      border-radius: 4px;
+    }
+    .seg-red   { background: linear-gradient(to right, rgba(200,40,60,0.7), rgba(220,60,80,0.5)); }
+    .seg-green { background: linear-gradient(to right, rgba(30,140,80,0.6), rgba(60,200,130,0.5)); }
+    .seg-gold  { background: linear-gradient(to right, rgba(200,160,30,0.6), rgba(245,200,66,0.5)); }
+
+    .moon-legend {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .moon-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.76rem;
+      color: #9b8bbf;
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red   { background: #e05070; }
+    .dot-green { background: #3ecf8e; }
+    .dot-gold  { background: #f5c842; }
+
+    .wheel-section {
+      margin-bottom: 52px;
+    }
+
+    .wheel-outer {
+      display: grid;
+      grid-template-columns: 180px auto 180px;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .wheel-label-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wheel-label {
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-align: center;
+    }
+
+    .wl-red {
+      background: rgba(200,40,60,0.12);
+      border: 1px solid rgba(220,60,80,0.3);
+    }
+    .wl-green {
+      background: rgba(30,140,80,0.12);
+      border: 1px solid rgba(60,200,130,0.3);
+    }
+    .wl-gold {
+      background: rgba(200,160,30,0.12);
+      border: 1px solid rgba(245,200,66,0.3);
+    }
+
+    .wl-emoji { font-size: 1.6rem; display: block; margin-bottom: 5px; }
+
+    .wl-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .wl-red .wl-title   { color: #f08090; }
+    .wl-green .wl-title { color: #6de0a8; }
+    .wl-gold .wl-title  { color: #f5c842; }
+
+    .wl-days {
+      font-size: 0.68rem;
+      color: #7c6fa0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .wheel-svg-wrap {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      flex-shrink: 0;
+    }
+
+    .phases-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-bottom: 52px;
+    }
+
+    .phase-card {
+      border-radius: 20px;
+      padding: 32px 36px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .phase-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1.5px;
+      background: var(--border-g);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    .phase-red {
+      background: linear-gradient(135deg, rgba(180,30,50,0.16), rgba(10,4,18,0.9));
+      --border-g: linear-gradient(135deg, #e05070, #5a0f20, transparent);
+    }
+    .phase-green {
+      background: linear-gradient(135deg, rgba(30,140,80,0.16), rgba(10,4,18,0.9));
+      --border-g: linear-gradient(135deg, #3ecf8e, #0a5030, transparent);
+    }
+    .phase-gold {
+      background: linear-gradient(135deg, rgba(200,150,30,0.16), rgba(10,4,18,0.9));
+      --border-g: linear-gradient(135deg, #f5c842, #806010, transparent);
+    }
+
+    .phase-icon-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 2px;
+    }
+
+    .phase-emoji { font-size: 3rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.25)); }
+
+    .phase-moon-badge {
+      font-size: 0.7rem;
+      text-align: center;
+      line-height: 1.4;
+      color: #9b8bbf;
+    }
+    .phase-moon-badge .moon-icons { font-size: 1.1rem; letter-spacing: 2px; }
+
+    .phase-days-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+    .badge-red   { background: rgba(220,60,80,0.2);  color: #f08090; border: 1px solid rgba(220,60,80,0.38); }
+    .badge-green { background: rgba(30,160,90,0.2);  color: #6de0a8; border: 1px solid rgba(30,160,90,0.38); }
+    .badge-gold  { background: rgba(220,170,30,0.2); color: #f5c842; border: 1px solid rgba(220,170,30,0.38); }
+
+    .phase-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .phase-red   .phase-content h2 { color: #f08090; }
+    .phase-green .phase-content h2 { color: #6de0a8; }
+    .phase-gold  .phase-content h2 { color: #f5c842; }
+
+    .phase-tagline {
+      font-size: 0.83rem;
+      font-style: italic;
+      color: #8a7bac;
+      margin-bottom: 16px;
+    }
+
+    .phase-description {
+      font-size: 0.88rem;
+      line-height: 1.78;
+      color: #c0b7d8;
+      margin-bottom: 18px;
+    }
+
+    .activities-list { display: flex; flex-wrap: wrap; gap: 9px; }
+
+    .activity-pill {
+      padding: 6px 13px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .pill-red   { background: rgba(220,60,80,0.18);  color: #f09aaa; border: 1px solid rgba(220,60,80,0.32); }
+    .pill-green { background: rgba(30,160,90,0.18);  color: #7de8b8; border: 1px solid rgba(30,160,90,0.32); }
+    .pill-gold  { background: rgba(220,170,30,0.18); color: #f5d060; border: 1px solid rgba(220,170,30,0.32); }
+
+    .weekly-structure {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(167,139,250,0.18);
+      border-radius: 20px;
+      padding: 30px 34px;
+      margin-bottom: 28px;
+    }
+
+    .weekly-structure h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: #a78bfa;
+      margin-bottom: 22px;
+    }
+
+    .week-days {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .day-box {
+      background: rgba(167,139,250,0.07);
+      border: 1px solid rgba(167,139,250,0.18);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .day-box .day-label    { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1.5px; color: #7c6fa0; margin-bottom: 7px; }
+    .day-box .day-activity { font-size: 0.82rem; font-weight: 600; color: #d0c5f2; line-height: 1.35; }
+    .day-box .day-emoji    { font-size: 1.3rem; display: block; margin-bottom: 5px; }
+    .day-box.highlight     { background: rgba(110,70,240,0.16); border-color: rgba(167,139,250,0.44); }
+
+    .philosophy {
+      background: linear-gradient(135deg, rgba(100,60,200,0.1), rgba(167,139,250,0.05));
+      border: 1px solid rgba(167,139,250,0.22);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .philosophy h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #a78bfa;
+      margin-bottom: 18px;
+    }
+
+    .philosophy p {
+      font-size: 0.93rem;
+      line-height: 1.85;
+      color: #c0b7d8;
+      max-width: 600px;
+      margin: 0 auto 22px;
+    }
+
+    .philosophy-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: #f5c842;
+      padding: 18px 28px;
+      border-left: 3px solid #f5c842;
+      border-right: 3px solid #f5c842;
+      border-radius: 8px;
+      background: rgba(245,200,66,0.05);
+      display: inline-block;
+    }
+
+    .cta {
+      background: linear-gradient(135deg, rgba(200,60,80,0.12), rgba(167,139,250,0.12), rgba(245,200,66,0.08));
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      padding: 34px 38px;
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .cta h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #f0eaf8; margin-bottom: 12px; }
+    .cta p   { font-size: 0.88rem; color: #a89cc8; line-height: 1.7; max-width: 500px; margin: 0 auto 20px; }
+
+    .steps { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      width: 120px;
+    }
+    .step-num {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.88rem;
+    }
+    .step-text { font-size: 0.76rem; color: #c4b5e8; text-align: center; line-height: 1.5; }
+    .step-arrow { align-self: center; color: rgba(167,139,250,0.38); font-size: 1.1rem; margin-top: -14px; }
+
+    .footer {
+      text-align: center;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer p { font-size: 0.78rem; color: rgba(167,139,250,0.44); font-style: italic; }
+
+    @media (max-width: 640px) {
+      .header h1 { font-size: 2rem; }
+      .phase-card { grid-template-columns: 1fr; gap: 18px; }
+      .phase-icon-col { flex-direction: row; justify-content: center; }
+      .week-days { grid-template-columns: repeat(2, 1fr); }
+      .page { padding: 40px 20px; }
+      .wheel-outer { grid-template-columns: 1fr; justify-items: center; }
+      .wheel-label-col { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .wheel-label { width: 140px; }
+      .moon-phases-row { grid-template-columns: repeat(4, 1fr); }
+      .moon-phase-bar { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="moon-glow"></div>
+    <h1>I Workout According<br>To My Cycle</h1>
+    <p class="byline">by Sanyuja</p>
+    <p class="subtitle">A cyclical approach to fitness, living in rhythm with your body</p>
+    <p class="intro">
+      Nobody told me I could work out differently every week of the month.
+      When I stopped ignoring my body's rhythm and started working <em>with</em> it,
+      everything changed.
+    </p>
+  </div>
+
+  <div class="moon-section">
+    <h2 class="moon-section-title">🌑 My Cycle is Synced With the Moon</h2>
+    <p class="moon-section-sub">White Moon Cycle: new moon with menstruation, full moon at ovulation</p>
+
+    <div class="moon-phases-row">
+      <div class="moon-phase">
+        <span class="moon-icon">🌑</span>
+        <span class="moon-name">New Moon</span>
+        <span class="moon-day">Day 1</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌒</span>
+        <span class="moon-name">Waxing Crescent</span>
+        <span class="moon-day">Day 5</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌓</span>
+        <span class="moon-name">First Quarter</span>
+        <span class="moon-day">Day 8</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌔</span>
+        <span class="moon-name">Waxing Gibbous</span>
+        <span class="moon-day">Day 11</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌕</span>
+        <span class="moon-name">Full Moon</span>
+        <span class="moon-day">Day 14</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌖</span>
+        <span class="moon-name">Waning Gibbous</span>
+        <span class="moon-day">Day 18</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌗</span>
+        <span class="moon-name">Last Quarter</span>
+        <span class="moon-day">Day 22</span>
+      </div>
+      <div class="moon-phase">
+        <span class="moon-icon">🌘</span>
+        <span class="moon-name">Waning Crescent</span>
+        <span class="moon-day">Day 26</span>
+      </div>
+    </div>
+
+    <div class="moon-phase-bar">
+      <div class="moon-bar-segment seg-red"></div>
+      <div class="moon-bar-segment seg-green"></div>
+      <div class="moon-bar-segment seg-green"></div>
+      <div class="moon-bar-segment seg-green"></div>
+      <div class="moon-bar-segment seg-green"></div>
+      <div class="moon-bar-segment seg-green"></div>
+      <div class="moon-bar-segment seg-gold"></div>
+      <div class="moon-bar-segment seg-gold"></div>
+    </div>
+
+    <div class="moon-legend">
+      <div class="moon-legend-item">
+        <div class="legend-dot dot-red"></div>
+        <span>🌑 New Moon · The Reset (Days 1-5)</span>
+      </div>
+      <div class="moon-legend-item">
+        <div class="legend-dot dot-green"></div>
+        <span>🌒 to 🌖 Waxing + Full + early Waning · The Rise (Days 5-24)</span>
+      </div>
+      <div class="moon-legend-item">
+        <div class="legend-dot dot-gold"></div>
+        <span>🌗🌘 Late Waning · The Wind Down (Week Before)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">three phases · three moon energies</div>
+
+  <div class="wheel-section">
+    <div class="wheel-outer">
+      <div class="wheel-label-col" style="align-items: flex-end;">
+        <div class="wheel-label wl-gold" style="text-align:right;">
+          <span class="wl-emoji">🌕</span>
+          <span class="wl-title">The Wind Down</span>
+          <span class="wl-days">Week Before · 🌗🌘</span>
+        </div>
+      </div>
+
+      <div class="wheel-svg-wrap">
+        <svg width="280" height="280" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glowStrong">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <path d="M140,140 L140,30 A110,110 0 0,1 238.9,91.8 Z"
+                fill="rgba(200,40,60,0.22)" stroke="#e05070" stroke-width="1.5" filter="url(#glow)"/>
+          <path d="M140,140 L238.9,91.8 A110,110 0 1,1 53.3,72.3 Z"
+                fill="rgba(30,140,80,0.18)" stroke="#3ecf8e" stroke-width="1.5" filter="url(#glow)"/>
+          <path d="M140,140 L53.3,72.3 A110,110 0 0,1 140,30 Z"
+                fill="rgba(200,160,30,0.2)" stroke="#f5c842" stroke-width="1.5" filter="url(#glow)"/>
+          <line x1="140" y1="20" x2="140" y2="32" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <line x1="238.9" y1="91.8" x2="227.2" y2="101.8" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <line x1="53.3" y1="72.3" x2="64.2" y2="82.8" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <circle cx="140" cy="24" r="4" fill="#1a1030" stroke="#f5c842" stroke-width="1.2"/>
+          <circle cx="140" cy="256" r="5" fill="#f5c842" stroke="#f5c842" stroke-width="0" filter="url(#glowStrong)" opacity="0.9"/>
+          <circle cx="140" cy="140" r="70" fill="none" stroke="rgba(167,139,250,0.1)" stroke-width="1" stroke-dasharray="3,4"/>
+          <circle cx="140" cy="140" r="56" fill="#06040f" stroke="rgba(167,139,250,0.25)" stroke-width="1"/>
+          <text x="140" y="134" text-anchor="middle" font-size="28">🌙</text>
+          <text x="140" y="155" text-anchor="middle" font-size="9" fill="#6b5f8a" font-family="Inter" letter-spacing="1.5">YOUR</text>
+          <text x="140" y="167" text-anchor="middle" font-size="9" fill="#6b5f8a" font-family="Inter" letter-spacing="1.5">CYCLE</text>
+        </svg>
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);text-align:center;">
+          <div style="font-size:0.58rem;color:#6b5f8a;letter-spacing:1px;">🌑 NEW MOON</div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);text-align:center;">
+          <div style="font-size:0.58rem;color:#f5c842;letter-spacing:1px;">🌕 FULL MOON · OVULATION</div>
+        </div>
+      </div>
+
+      <div class="wheel-label-col" style="align-items: flex-start;">
+        <div class="wheel-label wl-red">
+          <span class="wl-emoji">🔴</span>
+          <span class="wl-title">The Reset</span>
+          <span class="wl-days">Days 0-5 · 🌑</span>
+        </div>
+        <div class="wheel-label wl-green">
+          <span class="wl-emoji">🌱</span>
+          <span class="wl-title">The Rise</span>
+          <span class="wl-days">Days 5-24 · 🌒🌕🌖</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">three phases · three intentions</div>
+
+  <div class="phases-grid">
+    <div class="phase-card phase-red">
+      <div class="phase-icon-col">
+        <div class="phase-emoji">🔴</div>
+        <span class="phase-days-badge badge-red">Days 0-5</span>
+        <div class="phase-moon-badge">
+          <div class="moon-icons">🌑</div>
+          <div>New Moon<br>energy</div>
+        </div>
+      </div>
+      <div class="phase-content">
+        <h2>The Reset</h2>
+        <p class="phase-tagline">"The dam is full. The red flag is out. It's carnage time." 😂</p>
+        <p class="phase-description">
+          This phase is for rest, not punishment. Your body is already working hard enough.
+          Honor that. OMAD (one meal a day) is done at most twice this week.
+          The focus is gentle movement, warmth, and deep restoration.<br><br>
+          New moon energy matches perfectly: dark, inward, stillness.
+          This is where you release and begin again.
+        </p>
+        <div class="activities-list">
+          <span class="activity-pill pill-red">🧘 Yin Moon Yoga</span>
+          <span class="activity-pill pill-red">☕ Rest and Warmth</span>
+          <span class="activity-pill pill-red">🕯️ Ritual Ceremony</span>
+          <span class="activity-pill pill-red">🌙 Gentle Movement Only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card phase-green">
+      <div class="phase-icon-col">
+        <div class="phase-emoji">🌱</div>
+        <span class="phase-days-badge badge-green">Days 5-24</span>
+        <div class="phase-moon-badge">
+          <div class="moon-icons">🌒🌕🌖</div>
+          <div>Waxing to<br>Full Moon</div>
+        </div>
+      </div>
+      <div class="phase-content">
+        <h2>The Rise</h2>
+        <p class="phase-tagline">"Energy returns, strength increases, motivation flows."</p>
+        <p class="phase-description">
+          This is where you come alive. 4 workouts per week, with legs as the non-negotiable
+          foundation every other day. Arms, core, and cardio fill the remaining days.
+          Always yoga the morning after each workout. Always train at sunset. 🌅<br><br>
+          The waxing moon builds to the full moon peak at ovulation. Peak moon,
+          peak strength, peak power. This is your time.
+        </p>
+        <div class="activities-list">
+          <span class="activity-pill pill-green">🦵 Legs Every Other Day</span>
+          <span class="activity-pill pill-green">💪 Arms and Core</span>
+          <span class="activity-pill pill-green">🏃 Cardio</span>
+          <span class="activity-pill pill-green">🧘 Morning-After Yoga</span>
+          <span class="activity-pill pill-green">🌅 Sunset Training</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card phase-gold">
+      <div class="phase-icon-col">
+        <div class="phase-emoji">🌕</div>
+        <span class="phase-days-badge badge-gold">Week Before</span>
+        <div class="phase-moon-badge">
+          <div class="moon-icons">🌗🌘</div>
+          <div>Waning Moon<br>energy</div>
+        </div>
+      </div>
+      <div class="phase-content">
+        <h2>The Wind Down</h2>
+        <p class="phase-tagline">"I used to fight it. Now I honor it."</p>
+        <p class="phase-description">
+          Motivation dips, the body feels heavier, the mind gets foggy. And that is perfect.
+          No heavy lifting, no pushing through. This week is yoga and sauna only.<br><br>
+          The waning moon mirrors this exactly: releasing, softening, turning inward.
+          The sauna is medicine. The yoga is prayer. Together they carry you gently back to day zero.
+        </p>
+        <div class="activities-list">
+          <span class="activity-pill pill-gold">🧘 Yoga Only</span>
+          <span class="activity-pill pill-gold">🌿 Sauna Sessions</span>
+          <span class="activity-pill pill-gold">✨ Slow and Sacred</span>
+          <span class="activity-pill pill-gold">🚫 No Heavy Lifting</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="weekly-structure">
+    <h3>📅 Your Week During The Rise (Days 5-24)</h3>
+    <div class="week-days">
+      <div class="day-box highlight">
+        <span class="day-emoji">🦵</span>
+        <div class="day-label">Day A</div>
+        <div class="day-activity">Legs at Sunset</div>
+      </div>
+      <div class="day-box">
+        <span class="day-emoji">🧘</span>
+        <div class="day-label">Morning After</div>
+        <div class="day-activity">Stretch Yoga</div>
+      </div>
+      <div class="day-box">
+        <span class="day-emoji">💪</span>
+        <div class="day-label">Day B</div>
+        <div class="day-activity">Arms, Core and Cardio</div>
+      </div>
+      <div class="day-box highlight">
+        <span class="day-emoji">🦵</span>
+        <div class="day-label">Day C</div>
+        <div class="day-activity">Legs at Sunset</div>
+      </div>
+    </div>
+    <p style="margin-top:16px; font-size:0.8rem; color:#7c6fa0; font-style:italic; text-align:center;">
+      4 workouts per week · Legs every other day · Yoga every morning after a workout · Always train at sunset 🌅
+    </p>
+  </div>
+
+  <div class="divider">the philosophy</div>
+
+  <div class="philosophy">
+    <h2>🌙 The Philosophy</h2>
+    <p>
+      My body is not a machine that performs the same output every day.
+      She is <strong style="color:#e8a0bf">cyclical</strong>, <strong style="color:#6de0a8">seasonal</strong>, <strong style="color:#f5c842">rhythmic</strong>.
+      When I stopped trying to be consistent in the conventional sense,
+      same workout, same intensity, every day, and started being consistent with my <em>cycle</em> instead,
+      everything changed.
+    </p>
+    <p>
+      I am stronger. I recover faster. I actually enjoy moving my body.
+      Working out according to my cycle is not a hack. It is just <strong style="color:#a78bfa">listening.</strong>
+    </p>
+    <div class="philosophy-quote">
+      "Rejecting the collective's script and writing your own." 👑
+    </div>
+  </div>
+
+  <div class="cta">
+    <h3>🌀 Want to Try This?</h3>
+    <p>Your body already knows. You just have to listen. Here is how to start:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Track your cycle for one full month</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Notice your energy levels each week</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Match your workouts to your phase</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Rest when your body says rest</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>🌙 Cyclical fitness · Living in rhythm · Honoring your body's seasons · by Sanyuja</p>
+  </div>
+
+</div>
+
+<script>
+  const sc = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 1.8 + 0.4;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${-Math.random()*4}s;`;
+    sc.appendChild(s);
+  }
+</script>
+</body>
+</html>
