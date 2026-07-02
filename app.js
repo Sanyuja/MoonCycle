@@ -949,9 +949,8 @@ class CalendarModule extends BaseModule {
 
       <div class="card">
         <h3>Google Calendar</h3>
-        <p style="font-size:0.8rem;color:var(--text-soft);margin-bottom:14px;line-height:1.6;">Planned: Lunarly will turn these movement and focus blocks into calendar events. In this demo, you're seeing a preview only.</p>
-        <button class="gcal-btn" onclick="app.previewGoogleCalendar()">Push this week to Google Calendar (demo)</button>
-        <p style="font-size:0.72rem;color:var(--text-soft);opacity:0.75;font-style:italic;margin-top:10px;">In this demo, we show how your week would look; actual sync is added in custom setups.</p>
+        <p style="font-size:0.8rem;color:var(--text-soft);margin-bottom:14px;line-height:1.6;">Turn this week's movement and focus blocks into calendar events.</p>
+        <button class="gcal-btn" onclick="app.previewGoogleCalendar()">Push this week to Google Calendar</button>
         <div id="gcalPreview" style="display:none;margin-top:16px;"></div>
       </div>
     `;
