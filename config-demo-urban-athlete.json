@@ -157,9 +157,9 @@
     },
     "outdoorPreferences": {
       "enabled": true,
-      "location": "Your City",
-      "lat": 0,
-      "lon": 0,
+      "location": "Chicago",
+      "lat": 41.8781,
+      "lon": -87.6298,
       "units": "celsius",
       "activities": {
         "morningRun": {
@@ -360,10 +360,10 @@
     "weather": {
       "enabled": true,
       "provider": "open-meteo",
-      "lat": 0,
-      "lon": 0,
+      "lat": 41.8781,
+      "lon": -87.6298,
       "units": "celsius",
-      "locationLabel": "Your City"
+      "locationLabel": "Chicago"
     }
   },
 

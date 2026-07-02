@@ -26,9 +26,10 @@
 
   "cycle": {
     "type": "menopausal",
-    "subtype": "perimenopause",
+    "subtype": "postmenopause",
 
     "_note_for_devs": "No menstrual phases. Instead, an energy/symptom model drives all recommendations. The user logs their energy state daily, plus optional symptoms (hot flashes, sleep quality, joint pain, mood). The app does NOT track cycle days or predict a period.",
+    "_persona": "Demo persona: woman in her late 50s, post-menopause, based in Pune, India. Vegetarian diet with iron intake as an ongoing concern (common with a no-meat diet + heavier periods earlier in life). Physical activity baseline is modest — walking, light housework — not a gym habit, so guidance should build up gently rather than assume athletic fitness. Her primary creative/intellectual practice is singing (riyaz/bhajans), not deep-work or study.",
 
     "energyModel": {
       "states": {
@@ -38,12 +39,12 @@
           "icon": "⚡",
           "color": "#7ec8e3",
           "colorBg": "rgba(126,200,227,0.15)",
-          "desc": "Clear head, good stamina. Your body is ready for more today. Push a bit harder — this window is worth using.",
+          "desc": "Clear head, good stamina. Your body is ready for a bit more today — a longer walk, a full riyaz session, time with people. Use it.",
           "needs": [
-            "Strength or cardio session",
-            "Challenge yourself — new skills welcome",
-            "Social plans if you have energy",
-            "High-quality protein + complex carbs",
+            "A longer walk than usual, or a full singing/riyaz session",
+            "Iron-rich meal — dal, palak, or ragi today",
+            "Social time if you have the energy for it",
+            "Good protein at lunch",
             "Don't skip sleep tonight"
           ]
         },
@@ -53,10 +54,10 @@
           "icon": "🌿",
           "color": "#4a9bab",
           "colorBg": "rgba(74,155,171,0.15)",
-          "desc": "Steady state. Move well, eat well, sleep on time. This is your sustainable baseline — it's good.",
+          "desc": "Steady state. A daily walk, a bit of singing, home-cooked meals on time. This is your sustainable baseline — it's good, and it's enough.",
           "needs": [
-            "Walk or moderate workout",
-            "Balanced meals with good fats",
+            "Short walk — even 15–20 minutes counts",
+            "Balanced meals with dal, vegetables, and good fats",
             "Protect your wind-down routine",
             "Stay hydrated",
             "One priority task, not twenty"
@@ -80,7 +81,7 @@
       },
       "defaultState": "moderate",
       "checkInPrompt": "How does your body feel today?",
-      "symptoms": ["Hot flash", "Night sweats", "Joint stiffness", "Brain fog", "Mood dip", "Poor sleep", "Low libido", "Bloating"]
+      "symptoms": ["Hot flash", "Night sweats", "Joint stiffness", "Brain fog", "Mood dip", "Poor sleep", "Low libido", "Bloating", "Low iron / fatigue"]
     }
   },
 
@@ -93,17 +94,17 @@
 
   "activity": {
     "primaryType": "mixed-fitness",
-    "primaryMovementSuggestions": ["Strength training", "Walking", "Swimming", "Yoga", "Cycling", "Pilates"],
+    "primaryMovementSuggestions": ["Walking", "Yoga", "Light housework/gardening", "Swimming", "Pilates", "Strength training"],
     "primaryMovementByPhase": {
-      "low":      { "recommended": false, "intensity": "light", "note": "Swap full sessions for stretching, walking, or restorative work. Honor the low-energy day." },
-      "moderate": { "recommended": true, "intensity": "medium", "note": "Good window for a solid, steady session — nothing you need to push through." },
-      "high":     { "recommended": true, "intensity": "high", "note": "Your best-energy day. Push your hardest session here." }
+      "low":      { "recommended": false, "intensity": "light", "note": "Skip the walk today if you need to. A little stretching at home is enough. Honor the low-energy day." },
+      "moderate": { "recommended": true, "intensity": "light-medium", "note": "A comfortable walk or some time in the garden — steady is the goal, not intense." },
+      "high":     { "recommended": true, "intensity": "medium", "note": "Your best-energy day. A longer walk than usual, or try adding a few minutes of gentle strength work." }
     },
-    "primaryIntellectualSuggestions": ["Deep work / learning", "Writing", "Reading", "Studying", "Creative projects"],
+    "primaryIntellectualSuggestions": ["Singing / riyaz", "Bhajans", "Reading", "Puzzles", "Time with grandchildren", "Devotional practice"],
     "primaryIntellectualByPhase": {
-      "low":      { "recommended": true, "load": "low", "note": "Keep it light — review, admin, or rest your mind along with your body." },
-      "moderate": { "recommended": true, "load": "medium", "note": "Steady, sustainable focus — a good day for regular practice or moderate learning." },
-      "high":     { "recommended": true, "load": "high", "note": "Sharpest thinking of the cycle. Tackle the hardest, most complex work today." }
+      "low":      { "recommended": true, "load": "low", "note": "A few familiar bhajans, nothing that takes effort to learn. Let it be comforting, not a practice session." },
+      "moderate": { "recommended": true, "load": "medium", "note": "Good day for regular riyaz — work on breath control or a piece you're refining." },
+      "high":     { "recommended": true, "load": "high", "note": "Your clearest, most energetic day — a good window to learn a new raag or piece." }
     },
     "schedule": {
       "AM": { "window": "07:00-09:00", "label": "AM", "defaultType": "mobility" },
@@ -111,119 +112,120 @@
     },
     "outdoorPreferences": {
       "enabled": true,
-      "location": "Your city",
-      "lat": null,
-      "lon": null,
-      "units": "fahrenheit",
+      "location": "Pune",
+      "lat": 18.5204,
+      "lon": 73.8567,
+      "units": "celsius",
       "activities": {
         "morningWalk": {
           "label": "🌅 Morning Walk",
-          "minTempF": 40,
-          "maxTempF": 85,
+          "minTempC": 15,
+          "maxTempC": 32,
           "avoidWeatherCodes": [95, 96, 99],
-          "bestTimeWindow": "07:00–08:30",
-          "phasesBest": ["high", "moderate"]
+          "bestTimeWindow": "06:30–08:00",
+          "phasesBest": ["high", "moderate"],
+          "note": "Cooler Pune mornings are the easiest window before the day heats up."
         },
-        "hotTub": {
-          "label": "♨️ Hot Tub / Warm Bath",
+        "warmBath": {
+          "label": "♨️ Warm Bath",
           "preferWeatherCodes": [95, 96, 99],
-          "bestTimeWindow": "18:00–21:00",
+          "bestTimeWindow": "19:00–21:00",
           "phasesBest": ["low", "moderate"],
-          "note": "Heat therapy can ease joint pain and improve sleep onset — especially valuable in perimenopause."
+          "note": "Heat therapy can ease joint pain and improve sleep onset — especially valuable post-menopause."
         }
       }
     },
     "library": {
       "high": {
         "AM": [
-          { "name": "Power yoga or Pilates flow", "tag": "strength", "icon": "🧘" },
-          { "name": "Brisk outdoor walk — 45 min push", "tag": "outdoor", "icon": "🏃" },
-          { "name": "Strength circuit — upper + lower body", "tag": "strength", "icon": "💪" }
+          { "name": "Gentle yoga — mobility & balance", "tag": "rest", "icon": "🧘" },
+          { "name": "Longer walk — 35–40 min at a comfortable pace", "tag": "outdoor", "icon": "🚶" },
+          { "name": "Light strength — resistance band or bodyweight", "tag": "strength", "icon": "💪" }
         ],
         "PM": [
-          { "name": "Weight training — compound lifts (prioritize bone density)", "tag": "strength", "icon": "💪" },
-          { "name": "Dance class or movement you love", "tag": "play", "icon": "💃" },
-          { "name": "Swim laps or water aerobics", "tag": "water", "icon": "🏊" }
+          { "name": "Full riyaz session — work on a new piece", "tag": "play", "icon": "🎶" },
+          { "name": "Gardening or active housework", "tag": "outdoor", "icon": "🌿" },
+          { "name": "Time with grandchildren or family", "tag": "play", "icon": "👨‍👩‍👧" }
         ]
       },
       "moderate": {
         "AM": [
-          { "name": "Yoga — mobility & balance focus", "tag": "rest", "icon": "🧘" },
-          { "name": "Walk — 30 min, comfortable pace", "tag": "outdoor", "icon": "🚶" },
-          { "name": "Light Pilates — core & pelvic floor", "tag": "strength", "icon": "🧘" }
+          { "name": "Yoga — gentle mobility focus", "tag": "rest", "icon": "🧘" },
+          { "name": "Walk — 20–25 min, comfortable pace", "tag": "outdoor", "icon": "🚶" },
+          { "name": "Light stretching at home", "tag": "rest", "icon": "🧘" }
         ],
         "PM": [
-          { "name": "Moderate strength — keep load sensible", "tag": "strength", "icon": "💪" },
-          { "name": "Evening swim or hot tub soak", "tag": "water", "icon": "🏊" },
-          { "name": "Gentle hiking or nature walk", "tag": "outdoor", "icon": "🌲" }
+          { "name": "Regular riyaz practice", "tag": "play", "icon": "🎶" },
+          { "name": "Warm bath in the evening", "tag": "water", "icon": "🛁" },
+          { "name": "Slow walk around the neighborhood", "tag": "outdoor", "icon": "🚶" }
         ]
       },
       "low": {
         "AM": [
-          { "name": "Yin yoga — long holds, no effort", "tag": "rest", "icon": "🧘" },
-          { "name": "Short walk outside — 15 min is enough", "tag": "outdoor", "icon": "🚶" },
-          { "name": "Breathwork + gentle stretching", "tag": "rest", "icon": "🌬️" }
+          { "name": "Gentle seated stretching — no effort needed", "tag": "rest", "icon": "🧘" },
+          { "name": "Short walk — even 10–15 min is enough", "tag": "outdoor", "icon": "🚶" },
+          { "name": "Breathwork — slow, easy breathing", "tag": "rest", "icon": "🌬️" }
         ],
         "PM": [
-          { "name": "Hot bath or hot tub — full recovery", "tag": "water", "icon": "🛁" },
-          { "name": "Rest — watch something, do nothing", "tag": "rest", "icon": "🛋️" },
-          { "name": "Gentle restorative yoga", "tag": "rest", "icon": "🧘" }
+          { "name": "Warm bath — full recovery", "tag": "water", "icon": "🛁" },
+          { "name": "A few familiar bhajans, just for comfort", "tag": "rest", "icon": "🎶" },
+          { "name": "Rest — no guilt about doing nothing", "tag": "rest", "icon": "🛋️" }
         ]
       }
     },
     "cycleFocusOptions": [
-      { "value": "strength",     "label": "💪 Build & Maintain Muscle",     "note": "Resistance training 3-4x/week. Prioritize compound movements. Bone density is the goal, not just aesthetics." },
-      { "value": "mobility",     "label": "🧘 Mobility & Joint Health",      "note": "Yoga and Pilates-forward. Shorter strength sessions. Hot tub and stretching built into every week." },
-      { "value": "cardio",       "label": "❤️ Heart Health & Endurance",    "note": "Zone 2 cardio is your friend — walks, light cycling, swimming. Mix in 1-2 strength sessions." },
-      { "value": "weightloss",   "label": "🔥 Body Composition",            "note": "Resistance training takes priority over cardio for menopausal body composition. Protein is your lever." }
+      { "value": "iron",         "label": "🩸 Iron & Energy",               "note": "Vegetarian diets need extra attention to iron. Dal, palak, ragi, and jaggery at every meal where possible. Pair with vitamin C, skip tea/coffee right after eating." },
+      { "value": "mobility",     "label": "🧘 Mobility & Joint Health",      "note": "Gentle yoga-forward. Shorter walks, more stretching. Warm baths built into most evenings." },
+      { "value": "bones",        "label": "🦴 Bone Strength",               "note": "Even light resistance work (bands, bodyweight) 2x/week protects bone density. Calcium-rich vegetarian foods matter — dairy, til, ragi." },
+      { "value": "allaround",    "label": "✨ Balanced Weekly Rhythm",       "note": "A walk most days, riyaz whenever the mood strikes, rest when the body asks. No rigid plan." }
     ],
-    "defaultCycleFocus": "mobility",
-    "_note": "For menopausal users, resistance training to protect bone density is more critical than cardio. Recommend noting this in the activity module."
+    "defaultCycleFocus": "iron",
+    "_note": "This archetype's baseline physical activity is modest by design — gentle, achievable movement matters more than intensity. Iron and calcium intake (common concerns on a vegetarian diet) are prioritized alongside bone density."
   },
 
   "food": {
-    "pattern": "omnivore",
-    "culturalRestrictions": [],
-    "intro": "Hormonal changes shift how your body uses food. Protein, phytoestrogens, and anti-inflammatory foods matter more now.",
+    "pattern": "indian-vegetarian",
+    "culturalRestrictions": ["no meat", "no fish", "no eggs"],
+    "intro": "Vegetarian diets need real attention to iron, B12, and calcium — especially post-menopause when bone density drops faster. None of this needs to be complicated: dal, palak, ragi, and jaggery, eaten consistently, go a long way.",
     "phases": {
       "high": {
         "icon": "⚡",
-        "headline": "Fuel performance — protein first",
+        "headline": "Iron-forward, energising",
         "eat": [
-          "High-quality protein with every meal (30g+ targets)",
-          "Complex carbs for sustained energy",
-          "Colorful vegetables — antioxidant-rich",
-          "Omega-3 rich foods (salmon, walnuts, flax)",
-          "Phytoestrogens (soy, flax, chickpeas)"
+          "Dal or rajma at both lunch and dinner — protein + iron",
+          "Palak or other leafy greens, cooked with a squeeze of lemon (vitamin C helps iron absorption)",
+          "Ragi roti or ragi porridge — calcium and iron",
+          "Jaggery instead of refined sugar where possible",
+          "Til (sesame) or peanut chikki as a snack — calcium and healthy fats"
         ],
-        "limit": ["Excess refined sugar", "Alcohol — disrupts sleep and hot flashes"],
-        "note": "On high-energy days your body responds well to training and nutrition. Use this window to eat well and recover properly."
+        "limit": ["Tea or coffee right after meals (tannins block iron absorption — wait an hour)", "Refined sugar and maida"],
+        "note": "Good-energy days are the days to be consistent with dal and greens — the iron adds up over the week, not from any single meal."
       },
       "moderate": {
         "icon": "🌿",
-        "headline": "Steady, balanced & anti-inflammatory",
+        "headline": "Steady, calcium-rich, gut-friendly",
         "eat": [
-          "Lean protein (eggs, chicken, fish, legumes)",
-          "Fiber-rich foods — gut health matters more in menopause",
-          "Fermented foods (kimchi, kefir, yogurt)",
-          "Calcium-rich foods (dairy, fortified alternatives, leafy greens)",
-          "Healthy fats (avocado, olive oil, nuts)"
+          "Curd or buttermilk at lunch — calcium and probiotics",
+          "Sabzi with a little ghee — helps absorb fat-soluble vitamins",
+          "Sprouted moong or chana — easy protein",
+          "Seasonal fruit — guava, papaya, or amla for vitamin C",
+          "Methi (fenugreek) in sabzi or paratha"
         ],
-        "limit": ["Highly processed foods", "Excess caffeine (can worsen hot flashes)"],
-        "note": "Estrogen supports bone health — with less of it, calcium and vitamin D intake becomes critical. Don't undereat."
+        "limit": ["Highly processed / packaged snacks", "Excess tea across the day"],
+        "note": "Bone density loss is silent until it isn't. A cup of curd, some dal, and a handful of til across the day is more useful than any single 'superfood.'"
       },
       "low": {
         "icon": "🌙",
-        "headline": "Easy, warm & soothing",
+        "headline": "Warm, easy to digest",
         "eat": [
-          "Magnesium-rich foods (dark chocolate, pumpkin seeds, leafy greens)",
-          "Tryptophan foods for sleep support (turkey, eggs, seeds)",
-          "Warm, easy-to-digest meals — soups and stews",
-          "Ginger and turmeric (anti-inflammatory)",
-          "Herbal teas — chamomile, ashwagandha"
+          "Khichdi — gentle on digestion, still gives protein from dal + rice",
+          "Moong dal soup or clear vegetable soup",
+          "Warm haldi doodh (turmeric milk) before bed",
+          "Banana or dates for a gentle energy lift",
+          "Ginger tea for digestion — not caffeinated chai"
         ],
-        "limit": ["Alcohol (worsens hot flashes significantly)", "Spicy foods (can trigger hot flashes)", "Caffeine after noon"],
-        "note": "On low-energy days, your nervous system needs calming food, not stimulation. Prioritize warmth, magnesium, and early sleep."
+        "limit": ["Spicy or oily food (harder to digest on a low day)", "Caffeine after noon", "Cold or raw food"],
+        "note": "Low days are for khichdi and haldi doodh, not willpower. Let the food be gentle — the body is already asking for rest."
       }
     }
   },
@@ -263,26 +265,26 @@
   },
 
   "sexualHealth": {
-    "enabled": true,
-    "mode": "awareness",
+    "enabled": false,
+    "mode": null,
     "onHormonalBC": false,
     "onHRT": false,
     "displayFertilityWindow": false,
-    "note": "Perimenopause does not mean infertility until 12 months after your last period. Contraception may still be relevant. Consult your provider.",
-    "HRTNote": "If you are on hormone replacement therapy (HRT), the energy model still applies, but your symptom patterns may differ significantly from someone not on HRT.",
-    "disclaimer": "This app is a planning tool, not medical advice. Always consult your provider for reproductive and sexual health decisions."
+    "note": "Post-menopause (12+ months since last period) — fertility is no longer a consideration.",
+    "disclaimer": "This app is a planning tool, not medical advice. Always consult your provider for health decisions."
   },
 
   "medications": {
     "logEnabled": true,
     "items": [],
-    "commonMenopauseRx": ["HRT (estrogen)", "HRT (estrogen + progesterone)", "Tibolone", "SSRIs / SNRIs", "Gabapentin", "Clonidine", "Bisphosphonates"],
-    "disclaimer": "Hormone therapy and other medications significantly affect energy, sleep, and symptom patterns. Phase-based guidance should be adapted accordingly. Always follow your provider's advice."
+    "commonMenopauseRx": ["Iron supplement", "Vitamin B12", "Calcium + Vitamin D", "HRT (estrogen)", "HRT (estrogen + progesterone)", "Bisphosphonates", "Thyroid medication"],
+    "disclaimer": "Iron and B12 deficiency are common on a vegetarian diet and can mimic or worsen menopause fatigue — worth checking with a doctor rather than assuming it's 'just hormones.' Always follow your provider's advice."
   },
 
   "habits": {
-    "tracked": ["Workout", "Walk", "Protein", "Calcium", "Magnesium", "Sleep 7h+", "Alcohol-free", "No caffeine PM", "Meditation", "Stretching"],
-    "wellness": ["Workout", "Walk", "Protein", "Calcium", "Magnesium", "Sleep 7h+", "Stretching"],
+    "tracked": ["Walk", "Riyaz (singing)", "Iron-rich meal", "Calcium", "Sleep 7h+", "Meditation", "Stretching", "Tea after meals"],
+    "wellness": ["Walk", "Riyaz (singing)", "Iron-rich meal", "Calcium", "Sleep 7h+", "Stretching"],
+    "limit": ["Tea after meals"],
     "csvFormat": "checkmarks",
     "heatmapDays": 30,
     "wellnessTrendDays": 60
@@ -317,10 +319,10 @@
     "weather": {
       "enabled": true,
       "provider": "open-meteo",
-      "lat": null,
-      "lon": null,
-      "units": "fahrenheit",
-      "locationLabel": "Your city"
+      "lat": 18.5204,
+      "lon": 73.8567,
+      "units": "celsius",
+      "locationLabel": "Pune"
     }
   },
 

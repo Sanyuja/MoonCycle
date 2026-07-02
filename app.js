@@ -37,7 +37,12 @@ class StateManager {
       todayCheckin: null,       // { date, energyState, symptoms[] } — used for menopausal model
       fastClock: null,          // { startMs, goalHours }
       weather: null,
-      habitsData: null
+      habitsData: null,
+      fastingEnabled: true,     // natural-cycle: opt out of fasting guidance entirely
+      dietType: null,           // natural-cycle: 'omnivore' | 'vegetarian' | 'vegan'
+      energyPattern: null,      // menopausal: 'morning' | 'afternoon' | 'evening' — when energy is usually best
+      topSymptoms: [],          // menopausal: up to 3 symptoms the user says matter most
+      dietPreferences: []       // menopausal: e.g. ['High protein', 'Low sugar']
     };
   }
 
@@ -352,6 +357,7 @@ class TodayModule extends BaseModule {
               `).join('')}
             </div>
           </div>` : ''}
+        <p class="checkin-feeds-note">These check-ins feed your Insights: see energy and sleep patterns by ${isMenstrual ? 'phase' : 'energy state'} over time.</p>
       </div>` : ''}
 
       <!-- Primary Movement -->
@@ -364,6 +370,7 @@ class TodayModule extends BaseModule {
       <div class="need-card">
         <h3>Today's Guidance</h3>
         ${this._guidanceHTML(ph)}
+        ${this._lowEnergyNoteHTML()}
       </div>
 
       <!-- Pep Talk — the personal notes, kept front and center in their own card -->
@@ -408,6 +415,18 @@ class TodayModule extends BaseModule {
       return `<div class="need-items">${ph.needs.map(n => `<div class="need-pill">${n}</div>`).join('')}</div>`;
     }
     return `<div class="need-items"><div class="need-pill">Set up your cycle first →</div></div>`;
+  }
+
+  /** If today's logged/estimated energy score is meaningfully low, say so — even a "strong" phase
+   *  or "high energy" state shouldn't override what the body is actually reporting today. */
+  _lowEnergyNoteHTML() {
+    const stat = this.app.getHealthStat('energyScore');
+    if (stat.value == null || stat.value >= 40) return '';
+    const verb = stat.predicted ? 'has been trending low' : 'is low today';
+    return `
+      <div class="low-energy-note">
+        ⚠️ Your energy ${verb} (${Math.round(stat.value)}/100) — consider dialing back from what your phase alone would suggest. Gentler movement and lighter cognitive load are reasonable today, whatever the guidance above says.
+      </div>`;
   }
 
   _scoreRingsHTML() {
@@ -680,6 +699,7 @@ class NourishModule extends BaseModule {
       <div class="card">
         <h3>Eating Today</h3>
         <p style="font-size:0.8rem;color:var(--text-soft);margin-bottom:16px;line-height:1.5;">${foodConfig?.intro || ''}</p>
+        ${this.state.dietPreferences?.length ? `<p style="font-size:0.78rem;color:var(--gold-light);margin:-10px 0 16px;">Your focus: ${this.state.dietPreferences.join(', ')}</p>` : ''}
         ${currentFood ? `
           <div style="font-size:0.8rem;font-weight:bold;color:var(--gold);margin-bottom:8px;">Eat more:</div>
           <div class="food-tags">${(currentFood.eat || []).map(x=>`<div class="food-tag">${x}</div>`).join('')}</div>
@@ -689,7 +709,7 @@ class NourishModule extends BaseModule {
         ` : '<p style="color:var(--text-soft)">Set up your cycle to get food guidance.</p>'}
       </div>
 
-      ${fasting.enabled ? `
+      ${fasting.enabled && this.state.fastingEnabled !== false ? `
       <div class="card">
         <h3>Fasting Today</h3>
         <div style="margin-bottom:16px">
@@ -764,6 +784,12 @@ class InsightsModule extends BaseModule {
         <p style="font-size:0.8rem;color:var(--gold-light);margin:0;">✨ Showing example data so you can see what Insights looks like. Upload your Checkmarks.csv above to see your real patterns.</p>
       </div>
 
+      <div class="card" id="energyPatternsCard" style="display:none">
+        <h3>Energy &amp; Sleep Patterns</h3>
+        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:14px;">Built from your daily check-ins and logged body stats — real if you've logged them, illustrative if not.</p>
+        <div id="energyPatternsBody"></div>
+      </div>
+
       <div class="card" id="streakCard" style="display:none">
         <h3>Current Habit Streaks</h3>
         <div id="streakGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:4px;"></div>
@@ -800,12 +826,91 @@ class InsightsModule extends BaseModule {
     } else {
       // No upload yet this browser — show deterministic example data instead of an empty tab.
       // Never derived from or shipped with real personal data; purely illustrative shape, and
-      // rendered against a curated demo habit list rather than this user's real tracked habits.
+      // rendered against a curated demo habit list matching this archetype's persona.
       if (notice) notice.style.display = 'block';
-      const seed = HabitsEngine.generateSeedData();
-      const demoConfig = { ...this.config, habits: { ...this.config.habits, tracked: HabitsEngine._demoHabits, wellness: HabitsEngine._demoWellness, limit: HabitsEngine._demoLimit } };
+      const isMenopausal = this.config.cycle.type !== 'menstrual';
+      const habits    = isMenopausal ? HabitsEngine._demoHabitsMenopausal    : HabitsEngine._demoHabits;
+      const wellness  = isMenopausal ? HabitsEngine._demoWellnessMenopausal  : HabitsEngine._demoWellness;
+      const limit     = isMenopausal ? HabitsEngine._demoLimitMenopausal    : HabitsEngine._demoLimit;
+      const overrides = isMenopausal ? HabitsEngine._demoRateOverridesMenopausal : HabitsEngine._demoRateOverrides;
+      const seed = HabitsEngine.generateSeedData(45, habits, overrides);
+      const demoConfig = { ...this.config, habits: { ...this.config.habits, tracked: habits, wellness, limit } };
       HabitsEngine.renderAll(seed, this.state, demoConfig);
     }
+    this._renderEnergyPatterns();
+  }
+
+  /** Turns the unified healthData.history (body stats + energy check-ins, each tagged with a
+   *  phase/energy-state via app._historyPhaseKey) into three simple stat blocks: average energy
+   *  by phase, average sleep on symptom vs symptom-free days, and low-energy day counts by phase. */
+  _renderEnergyPatterns() {
+    const card = document.getElementById('energyPatternsCard');
+    const body = document.getElementById('energyPatternsBody');
+    if (!card || !body) return;
+
+    const history = (this.state.healthData?.history || []).filter(e => e.energyScore != null || e.energyState);
+    if (history.length < 3) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+
+    const isMenstrual = this.config.cycle.type === 'menstrual';
+    const phaseLabel = (key) => {
+      const ph = (isMenstrual ? this.config.cycle.phases : this.config.cycle.energyModel?.states)?.[key];
+      return ph?.shortLabel || ph?.label || key || 'Unknown';
+    };
+    const phaseColor = (key) => {
+      const ph = (isMenstrual ? this.config.cycle.phases : this.config.cycle.energyModel?.states)?.[key];
+      return ph?.color || '#c9b8e8';
+    };
+    const barRow = (label, value, color) => `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:88px;font-size:0.76rem;color:var(--text-soft);flex-shrink:0;">${label}</div>
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:6px;height:10px;overflow:hidden;">
+          <div style="width:${Math.max(4, Math.min(100, value))}%;height:100%;background:${color};"></div>
+        </div>
+        <div style="width:34px;text-align:right;font-size:0.76rem;color:var(--text);flex-shrink:0;">${Math.round(value)}</div>
+      </div>`;
+
+    const groups = {};
+    history.forEach(e => {
+      const key = this.app._historyPhaseKey(e) || 'unknown';
+      (groups[key] || (groups[key] = [])).push(e);
+    });
+
+    let html = '';
+
+    // Average energy by phase / energy-state
+    const avgByPhase = Object.entries(groups)
+      .map(([key, entries]) => {
+        const vals = entries.map(e => e.energyScore).filter(v => v != null);
+        return vals.length ? { key, avg: vals.reduce((a,b)=>a+b,0) / vals.length } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.avg - a.avg);
+    if (avgByPhase.length) {
+      html += `<div class="guidance-label" style="margin-bottom:10px;">Average energy by ${isMenstrual ? 'phase' : 'energy state'}</div>`;
+      html += avgByPhase.map(g => barRow(phaseLabel(g.key), g.avg, phaseColor(g.key))).join('');
+    }
+
+    // Average sleep: symptom days vs clear days
+    const avgSleep = (arr) => { const v = arr.map(e => e.sleepScore).filter(x => x != null); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; };
+    const sleepWith = avgSleep(history.filter(e => e.symptoms?.length));
+    const sleepWithout = avgSleep(history.filter(e => !e.symptoms?.length));
+    if (sleepWith != null && sleepWithout != null) {
+      html += `<div class="guidance-label" style="margin:18px 0 10px;">Average sleep — symptom days vs clear days</div>`;
+      html += barRow('Clear days', sleepWithout, 'var(--teal)');
+      html += barRow('Symptom days', sleepWith, 'var(--rose)');
+    }
+
+    // Low-energy days per phase / energy-state
+    const lowByPhase = Object.entries(groups)
+      .map(([key, entries]) => ({ key, low: entries.filter(e => (e.energyScore != null && e.energyScore < 40) || e.energyState === 'low').length, total: entries.length }))
+      .filter(g => g.total > 0);
+    if (lowByPhase.length) {
+      html += `<div class="guidance-label" style="margin:18px 0 10px;">Low-energy days logged, by ${isMenstrual ? 'phase' : 'state'}</div>`;
+      html += `<div class="need-items">${lowByPhase.map(g => `<div class="need-pill">${phaseLabel(g.key)}: ${g.low}/${g.total}</div>`).join('')}</div>`;
+    }
+
+    body.innerHTML = html || `<p style="font-size:0.8rem;color:var(--text-soft);">Log a few more check-ins to see patterns here.</p>`;
   }
 }
 
@@ -840,6 +945,14 @@ class CalendarModule extends BaseModule {
         <button class="sync-btn" onclick="app.syncWeeklyPlan()">Push This Week's Plan to ClickUp</button>
         <div class="sync-log" id="syncLog" style="margin-top:16px;display:none;">Paste your pk_ token above and hit push.</div>
       </div>` : ''}
+
+      <div class="card">
+        <h3>Google Calendar</h3>
+        <p style="font-size:0.8rem;color:var(--text-soft);margin-bottom:14px;line-height:1.6;">Planned: Lunarly will turn these movement and focus blocks into calendar events. In this demo, you're seeing a preview only.</p>
+        <button class="gcal-btn" onclick="app.previewGoogleCalendar()">Push this week to Google Calendar (demo)</button>
+        <p style="font-size:0.72rem;color:var(--text-soft);opacity:0.75;font-style:italic;margin-top:10px;">In this demo, we show how your week would look; actual sync is added in custom setups.</p>
+        <div id="gcalPreview" style="display:none;margin-top:16px;"></div>
+      </div>
     `;
   }
 
@@ -908,8 +1021,55 @@ class SettingsModule extends BaseModule {
           <label>Average Period Duration (days)</label>
           <input type="number" id="periodDuration" value="${this.state.periodDuration || this.config.cycle.periodDuration}" min="2" max="10" onchange="app.saveSettings()"/>
         </div>
+        <div class="grid-2">
+          <div class="form-row">
+            <label>Fasting</label>
+            <select id="fastingEnabled" onchange="app.saveSettings()">
+              <option value="yes" ${this.state.fastingEnabled !== false ? 'selected' : ''}>Yes, show fasting guidance</option>
+              <option value="no" ${this.state.fastingEnabled === false ? 'selected' : ''}>No, I don't fast</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Diet type</label>
+            <select id="dietType" onchange="app.saveSettings()">
+              ${['omnivore','vegetarian','vegan'].map(t => `<option value="${t}" ${(this.state.dietType || this.config.food?.pattern?.replace('indian-','') || 'omnivore') === t ? 'selected' : ''}>${t[0].toUpperCase()+t.slice(1)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
         <button class="save-btn" onclick="app.saveSettings()">Save & Refresh</button>
-      </div>` : ''}
+      </div>` : `
+      <div class="card">
+        <h3>Energy &amp; Symptom Profile</h3>
+        <p style="font-size:0.8rem;color:var(--text-soft);margin-bottom:14px;">Status: <strong style="color:var(--text)">Menopause</strong> — energy-based planning, no cycle-day math.</p>
+        <div class="form-row">
+          <label>When is your energy usually best?</label>
+          <select id="energyPattern" onchange="app.saveEnergyProfile()">
+            ${['morning','afternoon','evening'].map(t => `<option value="${t}" ${(this.state.energyPattern || 'morning') === t ? 'selected' : ''}>${t[0].toUpperCase()+t.slice(1)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Top symptoms (pick up to 3)</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+            ${(this.config.cycle.energyModel?.symptoms || []).map(s => `
+              <button type="button" onclick="app.toggleTopSymptom('${s}')"
+                class="symptom-btn ${(this.state.topSymptoms||[]).includes(s) ? 'active' : ''}"
+                style="padding:6px 12px;border-radius:20px;border:1px solid rgba(212,175,90,0.3);background:${(this.state.topSymptoms||[]).includes(s) ? 'rgba(212,175,90,0.2)' : 'rgba(255,255,255,0.06)'};cursor:pointer;font-size:0.75rem;color:var(--text-soft)">
+                ${s}
+              </button>`).join('')}
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Diet preferences</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+            ${['High protein','Low sugar','Avoid late heavy dinners','Vegetarian','Vegan','Iron-rich'].map(d => `
+              <button type="button" onclick="app.toggleDietPreference('${d}')"
+                class="symptom-btn ${(this.state.dietPreferences||[]).includes(d) ? 'active' : ''}"
+                style="padding:6px 12px;border-radius:20px;border:1px solid rgba(212,175,90,0.3);background:${(this.state.dietPreferences||[]).includes(d) ? 'rgba(212,175,90,0.2)' : 'rgba(255,255,255,0.06)'};cursor:pointer;font-size:0.75rem;color:var(--text-soft)">
+                ${d}
+              </button>`).join('')}
+          </div>
+        </div>
+      </div>`}
 
       <div class="card">
         <h3>Primary Movement Practice</h3>
@@ -1337,6 +1497,29 @@ const MODULE_REGISTRY = {
   settings: SettingsModule
 };
 
+// ─── DEMO PROFILES ────────────────────────────────────────────────────────────
+// Pre-filled "as if already set up" data for each public demo archetype, applied
+// in-memory only (never persisted beyond localStorage for that demo config id,
+// never derived from any real person's data) so the demo shows what Lunarly
+// actually does instead of an empty first-run state.
+
+const DEMO_PROFILES = {
+  'demo-urban-athlete': {
+    primaryMovement:     { name: 'Pole / Strength', description: '', sessionsPerWeek: 4, preferredTime: 'evening' },
+    primaryIntellectual: { name: 'Deep work / learning', description: '', sessionsPerWeek: 4, preferredTime: 'morning' },
+    healthBaseline: { energyScore: 68, sleepScore: 72, physicalRecovery: 62, mentalRecovery: 66 }
+  },
+  'menopausal-archetype': {
+    primaryMovement:     { name: 'Walking', description: '', sessionsPerWeek: 2, preferredTime: 'morning' },
+    primaryIntellectual: { name: 'Singing / riyaz', description: '', sessionsPerWeek: 3, preferredTime: 'evening' },
+    healthBaseline: { energyScore: 52, sleepScore: 58, physicalRecovery: 48, mentalRecovery: 62 },
+    energyPattern: 'morning',
+    topSymptoms: ['Low iron / fatigue', 'Joint stiffness', 'Poor sleep'],
+    dietPreferences: ['Vegetarian', 'Iron-rich'],
+    demoCheckin: { energyState: 'moderate', symptoms: ['Low iron / fatigue', 'Joint stiffness'] }
+  }
+};
+
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 class MoonCycleApp {
@@ -1351,19 +1534,38 @@ class MoonCycleApp {
 
   async init(configId, isDemo = false) {
     this._isDemo = isDemo;
-    if (isDemo) configId = 'demo-urban-athlete';
+    if (isDemo && !configId) configId = 'demo-urban-athlete';
     configId = configId || this._getSavedConfigId() || 'demo-urban-athlete';
     this.config = await loadConfig(configId);
     this._stateManager = new StateManager(configId);
     this.state = this._stateManager.load();
 
-    // Demo mode: pin to follicular ~day 10 in memory only — never reads or writes personal cycle data
+    // Demo mode: pre-fill in-memory only, per archetype — never reads or writes personal data,
+    // and never overwrites anything the visitor already changed themselves this browser session.
     if (isDemo) {
-      const demoStart = new Date();
-      demoStart.setDate(demoStart.getDate() - 9);
-      this.state.periodStart    = demoStart.toISOString().split('T')[0];
-      this.state.cycleLength    = 28;
-      this.state.periodDuration = 5;
+      const profile = DEMO_PROFILES[configId] || DEMO_PROFILES['demo-urban-athlete'];
+      if (this.config.cycle.type === 'menstrual') {
+        const demoStart = new Date();
+        demoStart.setDate(demoStart.getDate() - 9);
+        if (!this.state.periodStart) {
+          this.state.periodStart    = demoStart.toISOString().split('T')[0];
+          this.state.cycleLength    = 28;
+          this.state.periodDuration = 5;
+        }
+      } else {
+        const today = new Date().toISOString().split('T')[0];
+        if (!this.state.todayCheckin || this.state.todayCheckin.date !== today) {
+          this.state.todayCheckin = { date: today, ...(profile.demoCheckin || { energyState: 'moderate', symptoms: [] }) };
+        }
+        if (!this.state.energyPattern) this.state.energyPattern = profile.energyPattern || null;
+        if (!this.state.topSymptoms?.length) this.state.topSymptoms = profile.topSymptoms || [];
+      }
+      if (!this.state.primaryMovement) this.state.primaryMovement = profile.primaryMovement || null;
+      if (!this.state.primaryIntellectual) this.state.primaryIntellectual = profile.primaryIntellectual || null;
+      if (!this.state.dietPreferences?.length) this.state.dietPreferences = profile.dietPreferences || [];
+      if (!this.state.healthData.history.length && profile.healthBaseline) {
+        this.state.healthData.history = this._generateDemoHealthHistory(profile.healthBaseline, profile);
+      }
     }
 
     // Migrate defaults from config if state fields are null
@@ -1384,7 +1586,7 @@ class MoonCycleApp {
 
   async switchConfig(configId) {
     this._saveState();
-    await this.init(configId);
+    await this.init(configId, this._isDemo);
     this._updatePhaseBanner();
   }
 
@@ -1416,13 +1618,43 @@ class MoonCycleApp {
     const ps = document.getElementById('periodStart');
     const cl = document.getElementById('cycleLength');
     const pd = document.getElementById('periodDuration');
+    const fe = document.getElementById('fastingEnabled');
+    const dt = document.getElementById('dietType');
     if (ps) this.state.periodStart    = ps.value || null;
     if (cl) this.state.cycleLength    = parseInt(cl.value) || 35;
     if (pd) this.state.periodDuration = parseInt(pd.value) || 5;
+    if (fe) this.state.fastingEnabled = fe.value !== 'no';
+    if (dt) this.state.dietType       = dt.value;
     this.phaseEngine = new PhaseEngine(this.config, this.state);
     this._modules = {}; // force module re-render
     this._saveState();
     this._updatePhaseBanner();
+    this.switchTab(this.activeTabId);
+  }
+
+  saveEnergyProfile() {
+    const ep = document.getElementById('energyPattern');
+    if (ep) this.state.energyPattern = ep.value;
+    this._saveState();
+  }
+
+  toggleTopSymptom(s) {
+    const list = this.state.topSymptoms || (this.state.topSymptoms = []);
+    const idx = list.indexOf(s);
+    if (idx >= 0) list.splice(idx, 1);
+    else if (list.length < 3) list.push(s);
+    this._saveState();
+    this._modules = {};
+    this.switchTab(this.activeTabId);
+  }
+
+  toggleDietPreference(d) {
+    const list = this.state.dietPreferences || (this.state.dietPreferences = []);
+    const idx = list.indexOf(d);
+    if (idx >= 0) list.splice(idx, 1);
+    else list.push(d);
+    this._saveState();
+    this._modules = {};
     this.switchTab(this.activeTabId);
   }
 
@@ -1545,6 +1777,7 @@ class MoonCycleApp {
   setEnergyState(key) {
     const today = new Date().toISOString().split('T')[0];
     this.state.todayCheckin = { date: today, energyState: key, symptoms: this.state.todayCheckin?.symptoms || [] };
+    this._upsertHealthHistory(today, { energyState: key });
     this.phaseEngine = new PhaseEngine(this.config, this.state);
     this._modules = {};
     this._saveState();
@@ -1558,8 +1791,17 @@ class MoonCycleApp {
     if (idx >= 0) checkin.symptoms.splice(idx, 1);
     else checkin.symptoms.push(s);
     this.state.todayCheckin = checkin;
+    this._upsertHealthHistory(checkin.date, { symptoms: [...checkin.symptoms] });
     this._saveState();
     this.switchTab(this.activeTabId);
+  }
+
+  /** Which phase/energy-state a history entry represents — from its own logged energyState
+   *  (energy-model archetypes) or computed from its date (menstrual archetypes). Unifies both
+   *  data sources so Insights can group "average energy by phase" the same way either archetype. */
+  _historyPhaseKey(entry) {
+    if (this.config.cycle.type !== 'menstrual') return entry.energyState || null;
+    return HabitsEngine._phaseForDate(entry.date, this.state, this.config);
   }
 
   // ── Fast clock ───────────────────────────────────────────────────────────────
@@ -1634,6 +1876,42 @@ class MoonCycleApp {
 
   // ── Health history: prediction + manual entry ─────────────────────────────────
 
+  /** ~2 weeks of demo body-stat history wiggling around a baseline, so the demo's Today rings
+   *  show a believable recent trend and Insights has enough spread to chart something real —
+   *  instead of one flat repeated number or an empty tab. */
+  _generateDemoHealthHistory(baseline, profile) {
+    const wiggle = (dateStr, seed) => {
+      let h = 0;
+      const s = dateStr + seed;
+      for (let c = 0; c < s.length; c++) h = (Math.imul(31, h) + s.charCodeAt(c)) | 0;
+      return ((h >>> 0) % 25) - 12; // -12..+12
+    };
+    const clamp = v => Math.max(15, Math.min(95, Math.round(v)));
+    const isEnergyModel = this.config.cycle.type !== 'menstrual';
+    const history = [];
+    const today = new Date();
+    for (let i = 14; i >= 1; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const energyScore = clamp(baseline.energyScore + wiggle(dateStr, 'e'));
+      const entry = {
+        date: dateStr,
+        energyScore,
+        sleepScore:        clamp(baseline.sleepScore        + wiggle(dateStr, 's')),
+        physicalRecovery: clamp(baseline.physicalRecovery + wiggle(dateStr, 'p')),
+        mentalRecovery:    clamp(baseline.mentalRecovery    + wiggle(dateStr, 'm'))
+      };
+      if (isEnergyModel) {
+        entry.energyState = energyScore >= 62 ? 'high' : energyScore < 45 ? 'low' : 'moderate';
+        if (entry.energyState === 'low' && profile?.topSymptoms?.length) {
+          entry.symptoms = profile.topSymptoms.slice(0, 2);
+        }
+      }
+      history.push(entry);
+    }
+    return history;
+  }
+
   /** Upsert a day's health metrics into history, keyed by date (merges fields, doesn't overwrite unrelated keys). */
   _upsertHealthHistory(date, fields) {
     const history = this.state.healthData.history || (this.state.healthData.history = []);
@@ -1705,6 +1983,59 @@ class MoonCycleApp {
       }
     };
     reader.readAsText(file);
+  }
+
+  // ── Google Calendar (preview only — no real sync yet) ──────────────────────────
+
+  /** Shows what pushing this week's plan to Google Calendar would look like — same weekly
+   *  plan data as the ClickUp sync, formatted as a list of would-be calendar events. */
+  previewGoogleCalendar() {
+    const el = document.getElementById('gcalPreview');
+    if (!el) return;
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const timeRange = { morning: '7–8 AM', afternoon: '1–2 PM', evening: '6–7 PM' };
+    const plan = this.buildWeeklyPlan();
+
+    const events = [];
+    plan.forEach(day => {
+      const dayLabel = dayNames[day.date.getDay()];
+      if (day.movement) events.push({ day: dayLabel, time: timeRange[day.movement.time] || 'TBD', label: `Primary movement (${day.movement.name})` });
+      if (day.intellectual) events.push({ day: dayLabel, time: timeRange[day.intellectual.time] || 'TBD', label: `Focus block (${day.intellectual.name})` });
+    });
+
+    if (!events.length) {
+      el.innerHTML = `<p style="font-size:0.8rem;color:var(--text-soft);">Set your primary movement and intellectual practices in Settings to preview events.</p>`;
+    } else {
+      el.innerHTML = `
+        <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-light);margin-bottom:10px;">Preview calendar events</div>
+        ${events.map(e => `
+          <div class="session-row">
+            <div class="session-time">${e.day}</div>
+            <div class="session-detail">${e.time}: ${e.label}</div>
+          </div>`).join('')}
+      `;
+    }
+    el.style.display = 'block';
+    this._showGcalModal();
+  }
+
+  /** "Not live yet" CTA modal — turns the click into a warm sales lead instead of a dead end. */
+  _showGcalModal() {
+    document.getElementById('gcalModal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'gcalModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-box">
+        <h3>Google Calendar sync isn't live yet</h3>
+        <p>In the full version, this will push your Lunarly movement and focus blocks into your Google Calendar. If you want this working for your life or your clients today, email Sanyuja to get a personalized Lunarly setup with Google Calendar wired in.</p>
+        <div class="modal-actions">
+          <a class="modal-btn-primary" href="mailto:sanyujadesai@gmail.com?subject=Lunarly%20setup%20with%20Google%20Calendar">Email Sanyuja</a>
+          <button class="modal-btn-secondary" onclick="document.getElementById('gcalModal').remove()">Close</button>
+        </div>
+      </div>`;
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
   }
 
   // ── ClickUp sync ──────────────────────────────────────────────────────────────
@@ -1933,25 +2264,30 @@ const HabitsEngine = {
     };
   },
 
-  // Curated, presentable habit list for the demo — deliberately NOT the real config.habits.tracked
-  // list, since that mirrors this user's actual personal tracking (which includes habits she
-  // doesn't want shown publicly on a demo). Anyone's real upload still uses their own config.
+  // Curated, presentable habit lists for the demo — deliberately NOT the maintainer's real
+  // config.habits.tracked list. One set per public archetype, so each demo's Insights tab
+  // reflects what that persona would actually track. Anyone's real upload still uses their
+  // own config's habits regardless of these.
   _demoHabits: ['Strength Training', 'Yoga', 'Sugar', 'Alcohol', 'Protein', 'Salad', 'Read', 'Fast', 'Dry brush'],
   _demoWellness: ['Strength Training', 'Yoga', 'Protein', 'Salad', 'Read', 'Fast', 'Dry brush'],
   _demoLimit: ['Sugar', 'Alcohol'],
   // Per-habit target completion rate overrides — Alcohol should read as occasional, not a habit.
   _demoRateOverrides: { 'Alcohol': 0.08 },
 
+  _demoHabitsMenopausal: ['Walk', 'Riyaz (singing)', 'Iron-rich meal', 'Calcium', 'Sleep 7h+', 'Meditation', 'Stretching', 'Tea after meals'],
+  _demoWellnessMenopausal: ['Walk', 'Riyaz (singing)', 'Iron-rich meal', 'Calcium', 'Sleep 7h+', 'Stretching'],
+  _demoLimitMenopausal: ['Tea after meals'],
+  _demoRateOverridesMenopausal: { 'Tea after meals': 0.25 },
+
   /**
    * Deterministic, purely synthetic habit log used only when nothing has been uploaded yet —
    * so the Insights tab shows what it looks like instead of sitting empty. Never derived from
    * or containing any real personal data.
    */
-  generateSeedData(days = 45) {
-    const habits = this._demoHabits;
+  generateSeedData(days = 45, habits = this._demoHabits, rateOverrides = this._demoRateOverrides) {
     const habitRate = {};
     habits.forEach(h => {
-      const override = this._demoRateOverrides[h];
+      const override = rateOverrides[h];
       habitRate[h] = override != null ? override : 0.35 + this._seededRandom('rate:'+h)() * 0.5;
     });
     const data = [];
@@ -2339,7 +2675,7 @@ const app = new MoonCycleApp();
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const isDemo   = window.location.hostname.includes('vercel.app') || urlParams.has('demo');
-  const configId = isDemo ? 'demo' : (urlParams.get('config') || null);
+  const configId = urlParams.get('config') || (isDemo ? 'demo-urban-athlete' : null);
   app.init(configId, isDemo).then(() => {
     app._updatePhaseBanner();
   }).catch(err => {
