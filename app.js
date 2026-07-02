@@ -768,6 +768,7 @@ class NourishModule extends BaseModule {
 
 class InsightsModule extends BaseModule {
   render() {
+    const isMenstrual = this.config.cycle.type === 'menstrual';
     return `
       <div class="card">
         <h3>Load Your Habits Data</h3>
@@ -797,13 +798,13 @@ class InsightsModule extends BaseModule {
 
       <div class="card" id="heatmapCard" style="display:none">
         <h3>30-Day Habit Heatmap</h3>
-        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:10px;">Each row is a habit. Filled = done. Shaded bands = cycle phases.</p>
+        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:10px;">Each row is a habit. Filled = done. Shaded bands = ${isMenstrual ? 'cycle phases' : 'logged energy states'}.</p>
         <canvas id="heatmapChart" height="160" style="width:100%;display:block;"></canvas>
       </div>
 
       <div class="card" id="phaseCorrelCard" style="display:none">
-        <h3>Habits by Cycle Phase</h3>
-        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:10px;">% of days you completed each habit in each phase — your real patterns.</p>
+        <h3>Habits by ${isMenstrual ? 'Cycle Phase' : 'Energy State'}</h3>
+        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:10px;">% of days you completed each habit ${isMenstrual ? 'in each phase' : 'at each energy state'} — your real patterns.</p>
         <canvas id="phaseCorrelChart" height="240" style="width:100%;display:block;"></canvas>
       </div>
 
@@ -2253,6 +2254,12 @@ class MoonCycleApp {
 // Today's Body Stats.
 
 const HabitsEngine = {
+  _hexToRgba(hex, alpha) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+    const { r, g, b } = m ? { r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16) } : { r: 201, g: 184, b: 232 };
+    return `rgba(${r},${g},${b},${alpha})`;
+  },
+
   /** Small deterministic string-seeded PRNG — same inputs always produce the same demo data. */
   _seededRandom(seedStr) {
     let h = 0;
@@ -2387,6 +2394,32 @@ const HabitsEngine = {
     return 'luteal';
   },
 
+  /** Which energy state was logged for a historical date, from the unified healthData.history
+   *  (set by setEnergyState() at check-in time) — the energy-model equivalent of _phaseForDate. */
+  _energyStateForDate(dateStr, state) {
+    return (state.healthData?.history || []).find(e => e.date === dateStr)?.energyState || null;
+  },
+
+  /** Unified "what bucket did this date fall into" lookup — cycle phase for menstrual archetypes,
+   *  logged energy state for energy-model archetypes. Every habit-correlation function should go
+   *  through this instead of calling _phaseForDate directly, so it works for both archetype kinds. */
+  _phaseKeyForDate(dateStr, state, config) {
+    return config.cycle.type === 'menstrual' ? this._phaseForDate(dateStr, state, config) : this._energyStateForDate(dateStr, state);
+  },
+
+  /** Ordered list of { key, label, color } buckets to correlate habits against — the four cycle
+   *  phases for menstrual archetypes, or the archetype's own energy states (high/moderate/low,
+   *  in whatever order the config defines) for energy-model archetypes. Colors come straight from
+   *  config so this never hardcodes an archetype-specific palette. */
+  _phaseList(config) {
+    if (config.cycle.type === 'menstrual') {
+      const p = config.cycle.phases || {};
+      return ['menstrual','follicular','ovulatory','luteal'].filter(k => p[k]).map(k => ({ key: k, label: p[k].shortLabel || p[k].label || k, color: p[k].color || '#c9b8e8' }));
+    }
+    const states = config.cycle.energyModel?.states || {};
+    return Object.entries(states).map(([key, s]) => ({ key, label: s.shortLabel || s.label || key, color: s.color || '#c9b8e8' }));
+  },
+
   renderAll(data, state, config) {
     const trackedHabits = config.habits?.tracked || [];
     const { byDate, dates } = this._buildDayMap(data, trackedHabits);
@@ -2452,15 +2485,16 @@ const HabitsEngine = {
     const plotW = W - labelW;
     const cellW = plotW / days.length;
 
-    // Phase bands behind the grid
-    let bandStart = 0, bandPhase = this._phaseForDate(days[0], state, config);
+    // Phase/energy-state bands behind the grid — colors pulled straight from this archetype's config.
+    const bandColors = {};
+    this._phaseList(config).forEach(p => { bandColors[p.key] = this._hexToRgba(p.color, 0.1); });
+    let bandStart = 0, bandPhase = this._phaseKeyForDate(days[0], state, config);
     days.forEach((d, i) => {
-      const ph = this._phaseForDate(d, state, config);
+      const ph = this._phaseKeyForDate(d, state, config);
       if (ph !== bandPhase || i === days.length-1) {
         const end = i === days.length-1 ? i+1 : i;
         if (bandPhase) {
-          const colors = { menstrual:'rgba(244,160,181,0.1)', follicular:'rgba(201,184,232,0.1)', ovulatory:'rgba(245,200,66,0.1)', luteal:'rgba(124,92,191,0.08)' };
-          ctx.fillStyle = colors[bandPhase] || 'transparent';
+          ctx.fillStyle = bandColors[bandPhase] || 'transparent';
           ctx.fillRect(labelW + bandStart*cellW, 0, (end-bandStart)*cellW, habits.length*rowH);
         }
         bandStart = i; bandPhase = ph;
@@ -2492,12 +2526,7 @@ const HabitsEngine = {
   _renderPhaseCorrelation(byDate, dates, trackedHabits, state, config) {
     const canvas = document.getElementById('phaseCorrelChart');
     if (!canvas) return;
-    const phases = [
-      { key:'menstrual',  label:'Menstrual',  color:'#f4a0b5' },
-      { key:'follicular', label:'Follicular', color:'#b39ddb' },
-      { key:'ovulatory',  label:'Ovulatory',  color:'#f5c842' },
-      { key:'luteal',     label:'Luteal',     color:'#7c5cbf' }
-    ];
+    const phases = this._phaseList(config);
     const habits = trackedHabits;
     const dpr = window.devicePixelRatio || 1;
     const rowH = 26, labelW = 90;
@@ -2518,7 +2547,7 @@ const HabitsEngine = {
       phases.forEach((ph, pi) => {
         let yes=0, known=0;
         dates.forEach(d => {
-          if (this._phaseForDate(d, state, config) !== ph.key) return;
+          if (this._phaseKeyForDate(d, state, config) !== ph.key) return;
           const v = byDate[d][h];
           if (v !== null) { known++; if (v) yes++; }
         });
@@ -2636,13 +2665,17 @@ const HabitsEngine = {
         else if (bestLimit.rate >= 0.5) insights.push(`<strong>${bestLimit.h}</strong> is showing up often — ${Math.round(bestLimit.rate*100)}% of days. Worth keeping an eye on.`);
       }
     }
-    if (state.periodStart) {
+    const isMenstrual = config.cycle.type === 'menstrual';
+    const hasCorrelationSource = isMenstrual ? !!state.periodStart : (state.healthData?.history || []).some(e => e.energyState);
+    if (hasCorrelationSource) {
+      const phaseKeys = this._phaseList(config);
+      const phaseLabel = key => phaseKeys.find(p => p.key === key)?.label || key;
       let biggest = null;
       trackedHabits.forEach(h => {
         const byPhase = {};
-        ['menstrual','follicular','ovulatory','luteal'].forEach(ph => {
+        phaseKeys.forEach(({key: ph}) => {
           let yes=0, known=0;
-          dates.forEach(d => { if (this._phaseForDate(d,state,config)===ph) { const v=byDate[d][h]; if (v!==null){known++; if(v) yes++;} } });
+          dates.forEach(d => { if (this._phaseKeyForDate(d,state,config)===ph) { const v=byDate[d][h]; if (v!==null){known++; if(v) yes++;} } });
           if (known >= 3) byPhase[ph] = yes/known;
         });
         const vals = Object.entries(byPhase);
@@ -2653,10 +2686,13 @@ const HabitsEngine = {
         if (!biggest || swing > biggest.swing) biggest = { h, hiPh, hiVal, loPh, loVal, swing };
       });
       if (biggest && biggest.swing > 0.25) {
-        insights.push(`<strong>${biggest.h}</strong> happens ${Math.round(biggest.swing*100)}pp more often in your <strong>${biggest.hiPh}</strong> phase than your <strong>${biggest.loPh}</strong> phase.`);
+        const suffix = isMenstrual ? 'phase' : 'days';
+        insights.push(`<strong>${biggest.h}</strong> happens ${Math.round(biggest.swing*100)}pp more often on your <strong>${phaseLabel(biggest.hiPh)}</strong> ${suffix} than your <strong>${phaseLabel(biggest.loPh)}</strong> ${suffix}.`);
       }
     } else {
-      insights.push(`Set your period start date in Settings to unlock cycle-phase correlations for these habits.`);
+      insights.push(isMenstrual
+        ? `Set your period start date in Settings to unlock cycle-phase correlations for these habits.`
+        : `Log a few daily energy check-ins on the Today tab to unlock energy-state correlations for these habits.`);
     }
     el.innerHTML = `
       <div class="card">
