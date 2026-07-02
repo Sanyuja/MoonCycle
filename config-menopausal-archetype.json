@@ -1,0 +1,339 @@
+{
+  "meta": {
+    "id": "menopausal-archetype",
+    "label": "Perimenopause / Menopause — Energy-Based Planning",
+    "version": "2.0",
+    "theme": {
+      "font": "Playfair Display",
+      "bodyFont": "Inter",
+      "fontUrl": "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap",
+      "primaryColor": "#7fa8c9",
+      "accentColor": "#3d6a8a",
+      "goldColor": "#8fc9d4",
+      "roseColor": "#5a8fb0",
+      "tealColor": "#4a9bab",
+      "background": "linear-gradient(135deg, #0a1420 0%, #12283d 40%, #0a1828 100%)",
+      "cardBackground": "rgba(220,240,250,0.09)",
+      "textColor": "#dceaf2",
+      "textSoft": "#8aa8bc",
+      "logo": "logo-menopausal.png",
+      "appName": "Lunarly ✦ CycleWise",
+      "edition": "CycleWise",
+      "appSubtitle": "Energy‑aware planning for women navigating menopause.",
+      "stars": true
+    }
+  },
+
+  "cycle": {
+    "type": "menopausal",
+    "subtype": "perimenopause",
+
+    "_note_for_devs": "No menstrual phases. Instead, an energy/symptom model drives all recommendations. The user logs their energy state daily, plus optional symptoms (hot flashes, sleep quality, joint pain, mood). The app does NOT track cycle days or predict a period.",
+
+    "energyModel": {
+      "states": {
+        "high": {
+          "label": "High Energy",
+          "shortLabel": "High",
+          "icon": "⚡",
+          "color": "#7ec8e3",
+          "colorBg": "rgba(126,200,227,0.15)",
+          "desc": "Clear head, good stamina. Your body is ready for more today. Push a bit harder — this window is worth using.",
+          "needs": [
+            "Strength or cardio session",
+            "Challenge yourself — new skills welcome",
+            "Social plans if you have energy",
+            "High-quality protein + complex carbs",
+            "Don't skip sleep tonight"
+          ]
+        },
+        "moderate": {
+          "label": "Moderate Energy",
+          "shortLabel": "Moderate",
+          "icon": "🌿",
+          "color": "#4a9bab",
+          "colorBg": "rgba(74,155,171,0.15)",
+          "desc": "Steady state. Move well, eat well, sleep on time. This is your sustainable baseline — it's good.",
+          "needs": [
+            "Walk or moderate workout",
+            "Balanced meals with good fats",
+            "Protect your wind-down routine",
+            "Stay hydrated",
+            "One priority task, not twenty"
+          ]
+        },
+        "low": {
+          "label": "Rest & Restore",
+          "shortLabel": "Low",
+          "icon": "🌙",
+          "color": "#5a7a9a",
+          "colorBg": "rgba(90,122,154,0.15)",
+          "desc": "Rest is the workout today. Gentle movement, extra water, and permission to go slow. This is hormonal — it will pass.",
+          "needs": [
+            "Gentle yoga or a short walk only",
+            "Extra sleep and no guilt about it",
+            "Warm, easy-to-digest foods",
+            "Magnesium before bed",
+            "No intense training today"
+          ]
+        }
+      },
+      "defaultState": "moderate",
+      "checkInPrompt": "How does your body feel today?",
+      "symptoms": ["Hot flash", "Night sweats", "Joint stiffness", "Brain fog", "Mood dip", "Poor sleep", "Low libido", "Bloating"]
+    }
+  },
+
+  "hormoneModel": {
+    "enabled": false,
+    "suppressedBy": "menopause",
+    "note": "The natural hormone cycle curve is not shown because the menstrual phase model does not apply. Planning is based on your energy check-in and symptom log instead.",
+    "showSymptomLog": true
+  },
+
+  "activity": {
+    "primaryType": "mixed-fitness",
+    "primaryMovementSuggestions": ["Strength training", "Walking", "Swimming", "Yoga", "Cycling", "Pilates"],
+    "primaryMovementByPhase": {
+      "low":      { "recommended": false, "intensity": "light", "note": "Swap full sessions for stretching, walking, or restorative work. Honor the low-energy day." },
+      "moderate": { "recommended": true, "intensity": "medium", "note": "Good window for a solid, steady session — nothing you need to push through." },
+      "high":     { "recommended": true, "intensity": "high", "note": "Your best-energy day. Push your hardest session here." }
+    },
+    "primaryIntellectualSuggestions": ["Deep work / learning", "Writing", "Reading", "Studying", "Creative projects"],
+    "primaryIntellectualByPhase": {
+      "low":      { "recommended": true, "load": "low", "note": "Keep it light — review, admin, or rest your mind along with your body." },
+      "moderate": { "recommended": true, "load": "medium", "note": "Steady, sustainable focus — a good day for regular practice or moderate learning." },
+      "high":     { "recommended": true, "load": "high", "note": "Sharpest thinking of the cycle. Tackle the hardest, most complex work today." }
+    },
+    "schedule": {
+      "AM": { "window": "07:00-09:00", "label": "AM", "defaultType": "mobility" },
+      "PM": { "window": "16:00-18:00", "label": "PM", "defaultType": "primary" }
+    },
+    "outdoorPreferences": {
+      "enabled": true,
+      "location": "Your city",
+      "lat": null,
+      "lon": null,
+      "units": "fahrenheit",
+      "activities": {
+        "morningWalk": {
+          "label": "🌅 Morning Walk",
+          "minTempF": 40,
+          "maxTempF": 85,
+          "avoidWeatherCodes": [95, 96, 99],
+          "bestTimeWindow": "07:00–08:30",
+          "phasesBest": ["high", "moderate"]
+        },
+        "hotTub": {
+          "label": "♨️ Hot Tub / Warm Bath",
+          "preferWeatherCodes": [95, 96, 99],
+          "bestTimeWindow": "18:00–21:00",
+          "phasesBest": ["low", "moderate"],
+          "note": "Heat therapy can ease joint pain and improve sleep onset — especially valuable in perimenopause."
+        }
+      }
+    },
+    "library": {
+      "high": {
+        "AM": [
+          { "name": "Power yoga or Pilates flow", "tag": "strength", "icon": "🧘" },
+          { "name": "Brisk outdoor walk — 45 min push", "tag": "outdoor", "icon": "🏃" },
+          { "name": "Strength circuit — upper + lower body", "tag": "strength", "icon": "💪" }
+        ],
+        "PM": [
+          { "name": "Weight training — compound lifts (prioritize bone density)", "tag": "strength", "icon": "💪" },
+          { "name": "Dance class or movement you love", "tag": "play", "icon": "💃" },
+          { "name": "Swim laps or water aerobics", "tag": "water", "icon": "🏊" }
+        ]
+      },
+      "moderate": {
+        "AM": [
+          { "name": "Yoga — mobility & balance focus", "tag": "rest", "icon": "🧘" },
+          { "name": "Walk — 30 min, comfortable pace", "tag": "outdoor", "icon": "🚶" },
+          { "name": "Light Pilates — core & pelvic floor", "tag": "strength", "icon": "🧘" }
+        ],
+        "PM": [
+          { "name": "Moderate strength — keep load sensible", "tag": "strength", "icon": "💪" },
+          { "name": "Evening swim or hot tub soak", "tag": "water", "icon": "🏊" },
+          { "name": "Gentle hiking or nature walk", "tag": "outdoor", "icon": "🌲" }
+        ]
+      },
+      "low": {
+        "AM": [
+          { "name": "Yin yoga — long holds, no effort", "tag": "rest", "icon": "🧘" },
+          { "name": "Short walk outside — 15 min is enough", "tag": "outdoor", "icon": "🚶" },
+          { "name": "Breathwork + gentle stretching", "tag": "rest", "icon": "🌬️" }
+        ],
+        "PM": [
+          { "name": "Hot bath or hot tub — full recovery", "tag": "water", "icon": "🛁" },
+          { "name": "Rest — watch something, do nothing", "tag": "rest", "icon": "🛋️" },
+          { "name": "Gentle restorative yoga", "tag": "rest", "icon": "🧘" }
+        ]
+      }
+    },
+    "cycleFocusOptions": [
+      { "value": "strength",     "label": "💪 Build & Maintain Muscle",     "note": "Resistance training 3-4x/week. Prioritize compound movements. Bone density is the goal, not just aesthetics." },
+      { "value": "mobility",     "label": "🧘 Mobility & Joint Health",      "note": "Yoga and Pilates-forward. Shorter strength sessions. Hot tub and stretching built into every week." },
+      { "value": "cardio",       "label": "❤️ Heart Health & Endurance",    "note": "Zone 2 cardio is your friend — walks, light cycling, swimming. Mix in 1-2 strength sessions." },
+      { "value": "weightloss",   "label": "🔥 Body Composition",            "note": "Resistance training takes priority over cardio for menopausal body composition. Protein is your lever." }
+    ],
+    "defaultCycleFocus": "mobility",
+    "_note": "For menopausal users, resistance training to protect bone density is more critical than cardio. Recommend noting this in the activity module."
+  },
+
+  "food": {
+    "pattern": "omnivore",
+    "culturalRestrictions": [],
+    "intro": "Hormonal changes shift how your body uses food. Protein, phytoestrogens, and anti-inflammatory foods matter more now.",
+    "phases": {
+      "high": {
+        "icon": "⚡",
+        "headline": "Fuel performance — protein first",
+        "eat": [
+          "High-quality protein with every meal (30g+ targets)",
+          "Complex carbs for sustained energy",
+          "Colorful vegetables — antioxidant-rich",
+          "Omega-3 rich foods (salmon, walnuts, flax)",
+          "Phytoestrogens (soy, flax, chickpeas)"
+        ],
+        "limit": ["Excess refined sugar", "Alcohol — disrupts sleep and hot flashes"],
+        "note": "On high-energy days your body responds well to training and nutrition. Use this window to eat well and recover properly."
+      },
+      "moderate": {
+        "icon": "🌿",
+        "headline": "Steady, balanced & anti-inflammatory",
+        "eat": [
+          "Lean protein (eggs, chicken, fish, legumes)",
+          "Fiber-rich foods — gut health matters more in menopause",
+          "Fermented foods (kimchi, kefir, yogurt)",
+          "Calcium-rich foods (dairy, fortified alternatives, leafy greens)",
+          "Healthy fats (avocado, olive oil, nuts)"
+        ],
+        "limit": ["Highly processed foods", "Excess caffeine (can worsen hot flashes)"],
+        "note": "Estrogen supports bone health — with less of it, calcium and vitamin D intake becomes critical. Don't undereat."
+      },
+      "low": {
+        "icon": "🌙",
+        "headline": "Easy, warm & soothing",
+        "eat": [
+          "Magnesium-rich foods (dark chocolate, pumpkin seeds, leafy greens)",
+          "Tryptophan foods for sleep support (turkey, eggs, seeds)",
+          "Warm, easy-to-digest meals — soups and stews",
+          "Ginger and turmeric (anti-inflammatory)",
+          "Herbal teas — chamomile, ashwagandha"
+        ],
+        "limit": ["Alcohol (worsens hot flashes significantly)", "Spicy foods (can trigger hot flashes)", "Caffeine after noon"],
+        "note": "On low-energy days, your nervous system needs calming food, not stimulation. Prioritize warmth, magnesium, and early sleep."
+      }
+    }
+  },
+
+  "fasting": {
+    "enabled": true,
+    "defaultWindowHours": 14,
+    "goalOptions": [12, 14, 16],
+    "_note": "Menopausal women should be more cautious with extended fasting. Muscle loss risk increases without adequate protein. Recommend max 16:8 and only on moderate/high energy days.",
+    "phaseRules": {
+      "high": {
+        "recommended": true,
+        "maxWindowHours": 16,
+        "badge": "✅ OK today",
+        "reason": "High energy days tolerate fasting better. Keep protein high when you break the fast."
+      },
+      "moderate": {
+        "recommended": true,
+        "maxWindowHours": 14,
+        "badge": "✅ 14:10 is ideal",
+        "reason": "A 14-hour overnight fast supports insulin sensitivity without stressing cortisol."
+      },
+      "low": {
+        "recommended": false,
+        "maxWindowHours": 12,
+        "badge": "⚠️ Eat enough today",
+        "reason": "On low-energy days, fasting can worsen fatigue and cortisol. Prioritize nourishment."
+      }
+    },
+    "milestones": [
+      { "hours": 4,  "label": "Glycogen depleting",   "bio": "Your body is burning through stored glucose. Hunger is normal — it's just your ghrelin pattern." },
+      { "hours": 8,  "label": "Ketone shift begins",   "bio": "Insulin is dropping. Your body is starting to shift toward fat oxidation." },
+      { "hours": 12, "label": "Overnight reset",       "bio": "A gentle overnight fast is complete. This is a great stopping point for menopausal women." },
+      { "hours": 14, "label": "Ideal window",          "bio": "14 hours is a sweet spot — metabolic benefits without muscle-loss risk." },
+      { "hours": 16, "label": "Extended — be mindful", "bio": "Extended fasting on top of hormonal changes can stress cortisol. Break with protein first." }
+    ]
+  },
+
+  "sexualHealth": {
+    "enabled": true,
+    "mode": "awareness",
+    "onHormonalBC": false,
+    "onHRT": false,
+    "displayFertilityWindow": false,
+    "note": "Perimenopause does not mean infertility until 12 months after your last period. Contraception may still be relevant. Consult your provider.",
+    "HRTNote": "If you are on hormone replacement therapy (HRT), the energy model still applies, but your symptom patterns may differ significantly from someone not on HRT.",
+    "disclaimer": "This app is a planning tool, not medical advice. Always consult your provider for reproductive and sexual health decisions."
+  },
+
+  "medications": {
+    "logEnabled": true,
+    "items": [],
+    "commonMenopauseRx": ["HRT (estrogen)", "HRT (estrogen + progesterone)", "Tibolone", "SSRIs / SNRIs", "Gabapentin", "Clonidine", "Bisphosphonates"],
+    "disclaimer": "Hormone therapy and other medications significantly affect energy, sleep, and symptom patterns. Phase-based guidance should be adapted accordingly. Always follow your provider's advice."
+  },
+
+  "habits": {
+    "tracked": ["Workout", "Walk", "Protein", "Calcium", "Magnesium", "Sleep 7h+", "Alcohol-free", "No caffeine PM", "Meditation", "Stretching"],
+    "wellness": ["Workout", "Walk", "Protein", "Calcium", "Magnesium", "Sleep 7h+", "Stretching"],
+    "csvFormat": "checkmarks",
+    "heatmapDays": 30,
+    "wellnessTrendDays": 60
+  },
+
+  "wearables": {
+    "provider": "samsung-health",
+    "csvTypes": {
+      "sleep": {
+        "filePattern": "com.samsung.shealth.sleep_combined",
+        "label": "Sleep Data",
+        "icon": "😴",
+        "fields": { "sleepScore": "sleep_score", "physicalRecovery": "physical_recovery", "mentalRecovery": "mental_recovery", "timestamp": "start_time" }
+      },
+      "vitality": {
+        "filePattern": "com.samsung.shealth.vitality_score",
+        "label": "Vitality / Energy Score",
+        "icon": "⚡",
+        "fields": { "energyScore": "total_score", "timestamp": "day_time" }
+      },
+      "stress": {
+        "filePattern": "com.samsung.shealth.stress",
+        "label": "Stress Score",
+        "icon": "🧠",
+        "fields": { "stressScore": "score", "timestamp": "start_time" }
+      }
+    }
+  },
+
+  "integrations": {
+    "clickup": { "enabled": false },
+    "weather": {
+      "enabled": true,
+      "provider": "open-meteo",
+      "lat": null,
+      "lon": null,
+      "units": "fahrenheit",
+      "locationLabel": "Your city"
+    }
+  },
+
+  "ui": {
+    "tabs": [
+      { "id": "today",    "label": "✨ Today" },
+      { "id": "energy",   "label": "⚡ Energy Log" },
+      { "id": "nourish",  "label": "🌿 Nourish" },
+      { "id": "insights", "label": "📊 Insights" },
+      { "id": "calendar", "label": "🗓️ Calendar" },
+      { "id": "settings", "label": "⚙️ Settings" }
+    ],
+    "defaultTab": "today",
+    "safetyDisclaimer": "This is a planning dashboard, not a diagnostic tool. Nothing here is medical advice. Discuss all health decisions with your provider."
+  }
+}

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lunarly ✦ Rhythm Studio</title>
+
+<!-- Font is injected dynamically by app.js from config.meta.theme.fontUrl -->
+
+<style>
+/* ════════════════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — all populated at runtime from config
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --primary:   #c9b8e8;
+  --accent:    #7c5cbf;
+  --gold:      #d4af5a;
+  --gold-light:#f0d080;
+  --gold-glow: rgba(212,175,90,0.35);
+  --rose:      #f4a0b5;
+  --teal:      #80cbc4;
+  --text:      #e0d4f7;
+  --text-soft: #b8aad4;
+  --text-dark: #1a0e35;
+  --text-dark-soft: #5a4d7a;
+  --card:      rgba(255,255,255,0.09);
+  --card-border: rgba(212,175,90,0.16);
+  --glass:     rgba(201,184,232,0.18);
+  --shadow:    0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+
+  /* Two-font system: display serif for brand/headings, sans for everything you read */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font:         var(--font-body);
+
+  --bg:        linear-gradient(135deg, #1a0a2e 0%, #2d1b54 40%, #1a1040 100%);
+
+  /* Section rhythm — consistent spacing scale used across cards/sections */
+  --space-sm:  10px;
+  --space-md:  18px;
+  --space-lg:  28px;
+
+  --lilac:       #c9b8e8;
+  --lilac-light: #e8dff5;
+  --lilac-mid:   #b39ddb;
+  --lilac-dark:  #7c5cbf;
+  --lilac-deep:  #4a2c8a;
+  --rose-light:  #fce4ec;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+h1, h2, .brand-font { font-family: var(--font-display); }
+
+p, .body-copy { line-height: 1.65; }
+
+/* Stars — enabled when data-stars="true" */
+body[data-stars="true"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 80% 50%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 90%, rgba(255,255,255,0.3) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ── */
+.app-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* ── Site nav ── */
+.site-nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; background: rgba(10,8,20,0.55); backdrop-filter: blur(14px); border-bottom: 1px solid var(--card-border); flex-wrap: wrap; }
+.site-nav-brand { font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.1em; color: var(--gold-light); }
+.site-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
+.site-nav-links a { font-family: var(--font-body); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--text-soft); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+.site-nav-links a:hover { color: var(--gold-light); }
+
+/* ── Header ── */
+.header { text-align: center; padding: 28px 0 22px; margin-bottom: var(--space-md); scroll-margin-top: 70px; }
+.header-logo { width: 110px; height: 110px; object-fit: contain; display: block; margin: 0 auto 10px; mix-blend-mode: screen; filter: drop-shadow(0 0 18px rgba(212,175,90,0.5)); }
+.header h1 { font-size: 2rem; background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 0.14em; font-weight: normal; filter: drop-shadow(0 0 12px rgba(212,175,90,0.4)); }
+.header .edition { font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-top: 4px; opacity: 0.9; }
+.header .subtitle { font-family: var(--font-body); color: var(--gold); font-size: 0.75rem; letter-spacing: 0.25em; margin-top: 8px; opacity: 0.85; }
+.moon-icon { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+
+/* ── Info accordions (About / How it works) — website chrome, deliberately NOT dashboard cards.
+     Each closed summary reads as an ornamental break line: ──── ✦ TITLE ────  ── */
+.info-panels { margin: 0 0 var(--space-md); }
+.info-acc { background: transparent; scroll-margin-top: 74px; }
+.info-acc summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 16px; padding: 14px 4px; user-select: none; }
+.info-acc summary::-webkit-details-marker { display: none; }
+.info-acc summary::before { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-glow)); }
+.info-acc summary::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-glow), transparent); }
+.acc-title { display: flex; align-items: center; gap: 10px; white-space: nowrap; font-family: var(--font-display); font-size: 0.92rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-light); transition: color 0.2s, text-shadow 0.2s; }
+.info-acc summary:hover .acc-title { text-shadow: 0 0 14px var(--gold-glow); }
+.acc-caret { font-size: 0.6rem; color: var(--gold); transition: transform 0.25s ease; }
+.info-acc[open] .acc-caret { transform: rotate(90deg); }
+.acc-body { max-width: 620px; margin: 6px auto 26px; text-align: center; animation: accFade 0.35s ease; }
+@keyframes accFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.acc-logo { width: 58px; height: 58px; object-fit: contain; display: block; margin: 2px auto 12px; mix-blend-mode: screen; filter: drop-shadow(0 0 12px var(--gold-glow)); }
+.acc-body p { font-size: 0.86rem; color: var(--text-soft); margin-bottom: 12px; }
+.acc-body p strong { color: var(--text); font-weight: 600; }
+.acc-cta { font-size: 0.82rem; }
+.acc-cta a { color: var(--gold-light); text-decoration: underline; }
+.acc-divider { display: flex; align-items: center; gap: 12px; margin: 18px auto; max-width: 300px; }
+.acc-divider::before, .acc-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-glow), transparent); }
+.acc-divider span { color: var(--gold); font-size: 0.65rem; }
+.acc-body h3 { font-family: var(--font-display); font-size: 0.82rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); font-weight: normal; margin-bottom: 10px; scroll-margin-top: 74px; }
+.how-it-works-list { list-style: none; display: inline-flex; flex-direction: column; gap: 9px; margin: 0 auto 16px; text-align: left; }
+.how-it-works-list li { font-size: 0.86rem; color: var(--text-soft); padding-left: 24px; position: relative; }
+.how-it-works-list li::before { content: '✦'; position: absolute; left: 0; color: var(--gold); font-size: 0.72rem; }
+.privacy-note { font-size: 0.78rem; color: var(--text-soft); opacity: 0.85; font-style: italic; scroll-margin-top: 74px; }
+
+/* ── Footer ── */
+.site-footer { text-align: center; padding: 26px 20px 10px; margin-top: var(--space-lg); border-top: 1px solid var(--card-border); }
+.site-footer p { font-size: 0.78rem; color: var(--text-soft); margin-bottom: 6px; }
+.site-footer-identity { color: var(--text) !important; font-weight: 600; letter-spacing: 0.03em; }
+.site-footer a { color: var(--gold-light); text-decoration: none; cursor: pointer; }
+.site-footer a:hover { text-decoration: underline; }
+.site-footer-social { display: flex; justify-content: center; gap: 18px; margin: 10px 0 8px; }
+.site-footer-social a { display: inline-flex; padding: 6px; border-radius: 50%; border: 1px solid var(--card-border); transition: border-color 0.2s, transform 0.2s; }
+.site-footer-social a:hover { border-color: var(--gold); transform: translateY(-2px); text-decoration: none; }
+.site-footer-social svg { width: 16px; height: 16px; fill: var(--gold-light); }
+
+/* ── Phase Banner ── */
+.phase-banner { border-radius: 20px; padding: 22px 26px; margin-bottom: var(--space-md); backdrop-filter: blur(16px); border: 1px solid rgba(201,184,232,0.3); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.phase-icon { font-size: 2.8rem; flex-shrink: 0; }
+.phase-info h2 { font-size: 1.5rem; font-weight: normal; letter-spacing: 0.03em; color: var(--lilac-light); }
+.phase-info .phase-day { font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; opacity: 0.9; letter-spacing: 0.15em; margin-top: 4px; color: var(--lilac-light); }
+.phase-desc { font-family: var(--font-body); font-size: 0.88rem; margin-top: 8px; opacity: 0.95; line-height: 1.6; color: var(--lilac-light); }
+.phase-menstrual { background: linear-gradient(135deg, rgba(244,160,181,0.25), rgba(201,184,232,0.2)); }
+.phase-follicular { background: linear-gradient(135deg, rgba(201,184,232,0.25), rgba(128,203,196,0.2)); }
+.phase-ovulatory  { background: linear-gradient(135deg, rgba(245,200,66,0.2),   rgba(201,184,232,0.25)); }
+.phase-luteal     { background: linear-gradient(135deg, rgba(179,157,219,0.3),   rgba(244,160,181,0.15)); }
+
+/* ── First-time Setup Card — the prominent "start here" CTA shown before periodStart is set ── */
+.setup-card {
+  border-radius: 20px;
+  padding: 30px 26px;
+  margin-bottom: var(--space-md);
+  text-align: center;
+  background: linear-gradient(135deg, rgba(212,175,90,0.22), rgba(124,92,191,0.24));
+  border: 1.5px solid rgba(212,175,90,0.5);
+  box-shadow: 0 0 0 1px rgba(212,175,90,0.12), var(--shadow);
+  backdrop-filter: blur(16px);
+}
+.setup-card .setup-icon { font-size: 2.6rem; margin-bottom: 8px; }
+.setup-card h2 { font-size: 1.3rem; color: var(--gold-light); font-weight: normal; letter-spacing: 0.02em; margin-bottom: 10px; }
+.setup-card .setup-why { font-size: 0.85rem; color: var(--lilac-light); line-height: 1.6; max-width: 420px; margin: 0 auto 18px; }
+.setup-btn { padding: 12px 30px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #1a0e35; font-family: var(--font-body); font-weight: 700; letter-spacing: 0.06em; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+.setup-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,90,0.4); }
+
+/* ── Tabs — unified nav bar with underline active state ── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 6px;
+  box-shadow: var(--shadow);
+}
+.tab-btn {
+  flex: 1;
+  min-width: 84px;
+  padding: 10px 12px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-soft);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+  text-align: center;
+}
+.tab-btn:hover { background: rgba(201,184,232,0.1); color: var(--primary); }
+.tab-btn.active {
+  background: rgba(212,175,90,0.1);
+  color: var(--gold-light);
+  border-bottom-color: var(--gold);
+}
+
+/* ── Cards ── */
+.card { background: var(--card); border-radius: 18px; padding: 22px; margin-bottom: var(--space-md); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 1px solid var(--card-border); box-shadow: var(--shadow); }
+.card h3, .need-card h3 {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card h3::before, .need-card h3::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.card h3 { color: var(--gold); }
+#module-container > *:last-child { margin-bottom: 0; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* ── Card header row (title + optional info icon) ── */
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.card-head h3 { margin-bottom: 0; }
+.info-icon { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: var(--text-soft); background: rgba(255,255,255,0.08); border: 1px solid rgba(201,184,232,0.3); cursor: help; }
+.info-icon:hover { color: var(--gold-light); border-color: var(--gold); }
+
+/* ── Score Rings ── */
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 12px; }
+.score-item { text-align: center; }
+.score-ring { position: relative; width: 70px; height: 70px; margin: 0 auto 10px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .score-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: bold; color: var(--text); }
+.score-ring .score-num.no-data { font-size: 0.6rem; font-weight: 600; color: var(--text-soft); letter-spacing: 0.02em; line-height: 1.2; padding: 0 6px; opacity: 0.75; }
+.score-ring .score-num.predicted { font-style: italic; opacity: 0.72; }
+.score-label { font-size: 0.72rem; color: var(--text); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+.score-desc { font-size: 0.68rem; color: var(--text-soft); margin-top: 3px; line-height: 1.4; font-style: italic; }
+
+/* ── "Log today's numbers" as a real button, not an inline link ── */
+.log-toggle { margin-top: 16px; }
+.log-toggle summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 12px; background: rgba(212,175,90,0.14); border: 1px solid rgba(212,175,90,0.35); color: var(--gold-light); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em; transition: all 0.2s; }
+.log-toggle summary::-webkit-details-marker { display: none; }
+.log-toggle summary:hover { background: rgba(212,175,90,0.22); border-color: var(--gold); }
+.log-toggle[open] summary { border-radius: 12px 12px 0 0; }
+.log-toggle-body { margin-top: 0; padding: 14px 16px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,90,0.2); border-top: none; border-radius: 0 0 12px 12px; }
+
+/* ── Weather ── */
+.weather-subtitle { font-size: 0.75rem; color: var(--text-soft); font-style: italic; margin: -8px 0 14px; }
+.weather-layout { display: flex; flex-direction: column; gap: 16px; }
+.weather-main { display: flex; align-items: center; gap: 16px; }
+.weather-icon { font-size: 3rem; }
+.weather-temp { font-size: 2.2rem; color: var(--text); font-weight: bold; }
+.weather-desc { font-size: 0.85rem; color: var(--text-soft); margin-top: 2px; }
+.weather-detail { font-size: 0.75rem; color: var(--text-soft); margin-top: 8px; }
+.weather-rec { margin-top: 12px; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; line-height: 1.5; }
+.weather-outdoor { background: rgba(128,203,196,0.25); color: #0d3d39; border: 1px solid rgba(128,203,196,0.5); font-weight:500; }
+.weather-indoor  { background: rgba(201,184,232,0.3);  color: #2d1060; border: 1px solid rgba(201,184,232,0.5); font-weight:500; }
+.weather-storm   { background: rgba(80,80,160,0.2);    color: #1a1a5e; border: 1px solid rgba(80,80,160,0.4);   font-weight:500; }
+.weather-forecast { display: flex; gap: 8px; }
+.weather-forecast-day { flex: 1; text-align: center; background: rgba(255,255,255,0.07); border: 1px solid rgba(212,175,90,0.15); border-radius: 10px; padding: 10px 8px; font-size: 0.75rem; }
+.weather-forecast-label { font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text-soft); }
+.weather-forecast-icon { font-size: 1.2rem; margin: 6px 0; }
+.weather-forecast-temps { font-weight: 600; color: var(--text); }
+@media(min-width: 600px) {
+  .weather-layout { flex-direction: row; align-items: stretch; }
+  .weather-current { flex: 1.1; }
+  .weather-forecast { flex: 1; flex-direction: column; }
+  .weather-forecast-day { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 12px; }
+  .weather-forecast-icon { margin: 0; }
+  .weather-forecast-label { flex: 1; }
+}
+
+/* ── Hormone legend with level badges ── */
+.hormone-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; justify-content: center; }
+.hormone-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,184,232,0.18); border-radius: 20px; padding: 5px 12px 5px 10px; }
+.hormone-swatch { width: 16px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+.hormone-level { font-size: 0.62rem; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-soft); }
+.hormone-level.lvl-peak      { background: rgba(245,200,66,0.35); color: #5a4300; }
+.hormone-level.lvl-high      { background: rgba(244,160,181,0.3); color: #5a0a1a; }
+.hormone-level.lvl-moderate  { background: rgba(128,203,196,0.3); color: #0d3d39; }
+.hormone-level.lvl-low       { background: rgba(201,184,232,0.25); color: #3d2d60; }
+.hormone-level.lvl-verylow   { background: rgba(255,255,255,0.08); color: var(--text-soft); }
+
+/* ── Need Card ── */
+.need-card { background: linear-gradient(135deg, rgba(201,184,232,0.22), rgba(244,160,181,0.14)); border-radius: 18px; padding: 22px; border: 1px solid rgba(124,92,191,0.3); margin-bottom: var(--space-md); backdrop-filter: blur(22px); box-shadow: var(--shadow); }
+.need-card h3 { color: var(--gold-light); }
+.need-items { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.need-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; background: rgba(255,255,255,0.14); color: var(--text); border: 1px solid rgba(255,255,255,0.22); font-weight: 500; }
+
+/* ── Guidance groups (categorized needs: Movement / Recovery / Mindset) ── */
+.guidance-group { margin-top: 16px; }
+.guidance-group:first-of-type { margin-top: 4px; }
+.guidance-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--gold-light); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.intensity-badge { font-size: 0.62rem; padding: 2px 9px; border-radius: 8px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+.intensity-gentle   { background: rgba(201,184,232,0.35); color: #3d2d60; }
+.intensity-moderate { background: rgba(128,203,196,0.35); color: #0d3d39; }
+.intensity-building { background: rgba(245,200,66,0.3);   color: #5a4300; }
+.intensity-intense  { background: rgba(244,160,181,0.35); color: #5a0a1a; }
+.intensity-tapering { background: rgba(124,92,191,0.3);   color: #2d0e70; }
+
+/* ── Phase Tags ── */
+.phase-tag { display: inline-block; font-size: 0.65rem; padding: 3px 10px; border-radius: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; }
+
+/* ── Pep Talk / Notes Card ── */
+.pep-talk-card {
+  background: linear-gradient(135deg, rgba(212,175,90,0.14), rgba(124,92,191,0.16));
+  border: 1px solid rgba(212,175,90,0.32);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: var(--space-md);
+  backdrop-filter: blur(22px);
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.pep-talk-card h3 { color: var(--gold-light); margin-bottom: 10px; }
+.pep-talk-card p {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--lilac-light);
+}
+
+/* ── Workout Days ── */
+.workout-day { border-radius: 16px; padding: 18px; margin-bottom: 12px; border: 1px solid var(--card-border); background: var(--card); backdrop-filter: blur(18px); }
+.workout-day.today { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,90,0.25); }
+.workout-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.workout-day-name { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+.workout-day-date { font-size: 0.72rem; color: var(--text-soft); margin-top: 2px; }
+.workout-phase-tag { font-size: 0.65rem; padding: 3px 10px; border-radius: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; }
+.session-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+.session-time { font-size: 0.68rem; color: var(--gold); font-weight: 700; letter-spacing: 0.05em; min-width: 30px; margin-top: 2px; }
+.session-detail { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+.session-tag { display: inline-block; font-size: 0.65rem; padding: 2px 9px; border-radius: 8px; margin-left: 6px; vertical-align: middle; font-weight: 600; border: 1px solid transparent; }
+.tag-outdoor  { background: rgba(128,203,196,0.18); color: var(--teal); border-color: rgba(128,203,196,0.4); }
+.tag-pole     { background: rgba(244,160,181,0.18); color: var(--rose); border-color: rgba(244,160,181,0.4); }
+.tag-rest     { background: rgba(201,184,232,0.18); color: var(--lilac-light); border-color: rgba(201,184,232,0.4); }
+.tag-strength { background: rgba(124,92,191,0.22);  color: var(--lilac-light); border-color: rgba(124,92,191,0.45); }
+.tag-water    { background: rgba(100,180,220,0.2);  color: #8ecfef; border-color: rgba(100,180,220,0.4); }
+.tag-play     { background: rgba(245,185,66,0.18);  color: var(--gold-light); border-color: rgba(245,185,66,0.4); }
+.tag-focus    { background: rgba(212,175,90,0.16);  color: var(--gold); border-color: rgba(212,175,90,0.4); }
+
+/* ── Food Guide ── */
+.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.food-tag { padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; background: rgba(255,255,255,0.14); color: var(--text); border: 1px solid rgba(255,255,255,0.22); }
+.food-avoid { background: rgba(244,160,181,0.16); border-color: rgba(244,160,181,0.4); color: var(--rose); font-weight:500; }
+.food-note { font-size: 0.8rem; color: var(--text-soft); margin-top: 10px; line-height: 1.6; font-style: italic; }
+
+/* ── Fasting ── */
+.fasting-phase-card { background: rgba(255,255,255,0.07); border-radius: 16px; border: 1px solid rgba(212,175,90,0.2); padding: 18px 20px; margin-bottom: var(--space-md); backdrop-filter: blur(10px); }
+.fasting-window-badge { display: inline-block; background: rgba(212,175,90,0.16); border: 1px solid rgba(212,175,90,0.38); border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; color: var(--gold-light); letter-spacing: 0.08em; font-weight: bold; margin-bottom: 10px; }
+.fasting-window-badge.no-fast { background: rgba(244,160,181,0.13); border-color: rgba(244,160,181,0.32); color: var(--rose); }
+.fast-goal-row { display: flex; gap: 8px; margin: 12px 0; }
+.fast-goal-btn { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(212,175,90,0.22); border-radius: 10px; color: var(--text-soft); font-size: 0.8rem; padding: 10px 6px; cursor: pointer; transition: all 0.2s; font-family: var(--font); }
+.fast-goal-btn.active, .fast-goal-btn:hover { border-color: var(--gold); color: var(--gold-light); background: rgba(212,175,90,0.1); }
+.fast-start-btn { width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: none; border-radius: 12px; color: #1a0e35; font-family: var(--font); font-size: 1rem; font-weight: bold; padding: 14px 28px; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+.fast-start-btn:hover { opacity: 0.9; }
+.fast-time-display { font-size: 3.8rem; font-family: var(--font-display); color: #fff; letter-spacing: -2px; text-shadow: 0 0 40px rgba(212,175,90,0.4); }
+.fast-bar-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; margin: 12px 0; }
+.fast-bar-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width 1s ease; }
+.fast-reset-btn { width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-soft); font-size: 0.75rem; padding: 10px; cursor: pointer; margin-top: 10px; font-family: var(--font); }
+.fast-reset-btn:hover { border-color: rgba(244,160,181,0.4); color: var(--rose); }
+
+/* ── ClickUp ── */
+.sync-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--lilac-dark), #9c6fd6); color: #fff; font-size: 1rem; letter-spacing: 0.1em; cursor: pointer; font-family: var(--font); transition: all 0.2s; box-shadow: 0 4px 20px rgba(124,92,191,0.4); margin-bottom: 12px; }
+.sync-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,92,191,0.5); }
+.sync-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.sync-log { background: rgba(0,0,0,0.06); border-radius: 10px; padding: 12px; font-size: 0.75rem; color: var(--text-soft); max-height: 150px; overflow-y: auto; font-family: monospace; line-height: 1.6; }
+
+/* ── Settings / Forms ── */
+.form-row { margin-bottom: 16px; }
+.form-row label { display: block; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); margin-bottom: 7px; font-weight: 700; }
+.form-row input, .form-row select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(201,184,232,0.4); background: rgba(255,255,255,0.88); color: var(--text-dark); font-family: var(--font-body); font-size: 0.9rem; }
+.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--lilac-mid); }
+.save-btn { padding: 10px 24px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--lilac-mid), var(--lilac-dark)); color: #fff; font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s; }
+.save-btn:hover { opacity: 0.9; }
+
+/* ── CSV Upload ── */
+.upload-zone { border: 2px dashed rgba(201,184,232,0.5); border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.05); color: var(--primary); margin-bottom: var(--space-md); }
+.upload-zone:hover { border-color: var(--lilac-mid); background: rgba(201,184,232,0.08); }
+.upload-zone .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+.upload-zone p { font-size: 0.82rem; opacity: 0.8; line-height: 1.5; }
+.upload-zone input[type=file] { display: none; }
+.upload-status { font-size: 0.78rem; color: var(--lilac-dark); margin-top: 8px; }
+
+/* ── Cycle Wheel ── */
+.cycle-wheel-wrap { text-align: center; margin-bottom: 16px; }
+.cycle-wheel-wrap svg, .cycle-wheel-wrap canvas { max-width: 280px; }
+
+/* ── Status Pills ── */
+.status-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; }
+.pill-success { background: rgba(128,203,196,0.3); color: #1a5c58; }
+.pill-warn    { background: rgba(245,200,66,0.3);   color: #7a5a00; }
+.pill-info    { background: rgba(201,184,232,0.3);   color: var(--lilac-deep); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,184,232,0.4); border-radius: 4px; }
+
+/* ── Responsive ── */
+@media(max-width: 600px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.5rem; }
+  .tabs { gap: 5px; }
+  .tab-btn { font-size: 0.72rem; padding: 8px 10px; min-width: 70px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SITE NAV — brand text filled in by app.js _buildHeader() -->
+<nav class="site-nav">
+  <div class="site-nav-brand" id="navBrand">Lunarly</div>
+  <div class="site-nav-links">
+    <a onclick="toggleInfo('about')">About</a>
+    <a onclick="toggleInfo('how-it-works')">How it works</a>
+    <a href="#app">Demo / App</a>
+    <a href="#app" onclick="app.switchTab('settings')">Settings</a>
+  </div>
+</nav>
+
+<script>
+  // Open/close the info accordions from nav & footer links
+  function toggleInfo(id, anchorId) {
+    const d = document.getElementById(id);
+    if (!d) return;
+    d.open = anchorId ? true : !d.open;
+    if (d.open) {
+      const target = anchorId ? document.getElementById(anchorId) : d;
+      (target || d).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+</script>
+
+<div class="app-wrap">
+
+  <!-- HEADER — populated by app.js _buildHeader() -->
+  <div class="header" id="app-header">
+    <div class="moon-icon">🌙</div>
+    <h1>Cycle Planner</h1>
+    <div class="subtitle">✦ LOADING ✦</div>
+  </div>
+
+  <!-- INFO PANELS — collapsed by default so the daily view stays clean; opened from the top nav -->
+  <div class="info-panels">
+    <details class="info-acc" id="about">
+      <summary><span class="acc-title"><span class="acc-caret">✦</span>About Lunarly</span></summary>
+      <div class="acc-body">
+        <img id="aboutLogo" class="acc-logo" src="logo.png" alt="Lunarly logo"/>
+        <p>Lunarly is a cycle-aware planning studio — it reads your body's rhythm and turns it into daily guidance for movement, work, food, and rest.</p>
+        <p>Two editions live here: <strong>Rhythm Studio</strong>, for natural-cycle women who train and perform, and <strong>CycleWise</strong>, for women navigating menopause who want energy-aware planning instead of period tracking.</p>
+        <div class="acc-divider"><span>✦</span></div>
+        <h3 id="archetypes">Archetypes</h3>
+        <p><strong>Natural cycle</strong> — phase-by-phase guidance across menstrual, follicular, ovulatory, and luteal days.</p>
+        <p><strong>Menopause</strong> — a daily energy check-in (high / moderate / low) drives the same kind of guidance, with no cycle-day math.</p>
+        <div class="acc-divider"><span>✦</span></div>
+        <p class="acc-cta">Want your own? <a href="https://github.com/Sanyuja/MoonCycle" target="_blank" rel="noopener">Clone & customize yours on GitHub →</a></p>
+      </div>
+    </details>
+
+    <details class="info-acc" id="how-it-works">
+      <summary><span class="acc-title"><span class="acc-caret">✦</span>How it works</span></summary>
+      <div class="acc-body">
+        <ul class="how-it-works-list">
+          <li>Set your rhythm: natural cycle or menopause.</li>
+          <li>Tell Lunarly your main movement and brain practices.</li>
+          <li>Optionally upload health/habits CSVs.</li>
+          <li>Use daily/weekly guidance to plan movement, work, fasting, and rest.</li>
+        </ul>
+        <p id="privacy" class="privacy-note">Privacy basics: your data never leaves your browser — CSVs are parsed locally, nothing is uploaded or stored on a server.</p>
+      </div>
+    </details>
+  </div>
+
+  <main id="app">
+    <!-- TABS — injected by app.js _buildTabs() from config.ui.tabs -->
+    <div class="tabs" id="tabs-container"></div>
+
+    <!-- PHASE BANNER (or first-time setup card) — updated by app.js _updatePhaseBanner() -->
+    <div class="phase-banner" id="phaseBanner">
+      <div class="phase-icon" id="phaseIcon">🌑</div>
+      <div class="phase-info">
+        <h2 id="phaseName">Loading…</h2>
+        <div class="phase-day" id="phaseDay">INITIALIZING</div>
+        <div class="phase-desc" id="phaseDesc">Setting up your personalized dashboard.</div>
+      </div>
+    </div>
+
+    <!-- MODULE CONTAINER — each tab module renders here -->
+    <div id="module-container">
+      <div class="card">
+        <h3>⏳ Loading</h3>
+        <p style="color:var(--text-soft);font-size:0.83rem;">Fetching your configuration…</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="site-footer-identity">Lunarly · built by Sanyuja</p>
+    <p class="site-footer-contact">Contact: <a href="mailto:sanyujadesai@gmail.com">sanyujadesai@gmail.com</a></p>
+    <div class="site-footer-social">
+      <a href="https://github.com/Sanyuja/MoonCycle" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sanyujadesai" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/sanyu.de/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </a>
+    </div>
+    <p class="site-footer-links"><a onclick="toggleInfo('about','about')">About Lunarly</a> · <a onclick="toggleInfo('about','archetypes')">Archetypes</a> · <a onclick="toggleInfo('how-it-works','privacy')">Privacy basics</a></p>
+  </footer>
+
+</div><!-- end app-wrap -->
+
+<!--
+  AVAILABLE_CONFIGS: list all config-<id>.json files you've created.
+  The settings tab will offer these as a switcher dropdown.
+  To add a new archetype: create config-<id>.json and add the id here.
+-->
+<script>
+  window.AVAILABLE_CONFIGS = ['demo-urban-athlete', 'menopausal-archetype'];
+</script>
+
+<script src="app.js"></script>
+</body>
+</html>

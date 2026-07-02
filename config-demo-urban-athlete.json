@@ -1,0 +1,382 @@
+{
+  "meta": {
+    "id": "demo-urban-athlete",
+    "label": "Lunarly ✦ Rhythm Studio — Demo (Urban Athlete)",
+    "version": "2.0",
+    "theme": {
+      "font": "Playfair Display",
+      "bodyFont": "Inter",
+      "fontUrl": "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap",
+      "primaryColor": "#c9b8e8",
+      "accentColor": "#7c5cbf",
+      "goldColor": "#d4af5a",
+      "roseColor": "#f4a0b5",
+      "tealColor": "#80cbc4",
+      "background": "linear-gradient(135deg, #1a0a2e 0%, #2d1b54 40%, #1a1040 100%)",
+      "cardBackground": "rgba(255,255,255,0.09)",
+      "textColor": "#e0d4f7",
+      "textSoft": "#b8aad4",
+      "logo": "logo.png",
+      "appName": "Lunarly ✦ Rhythm Studio",
+      "edition": "Rhythm Studio",
+      "appSubtitle": "Cycle‑aware planning for women who train, perform, and manage high‑output routines.",
+      "stars": true
+    }
+  },
+
+  "cycle": {
+    "type": "menstrual",
+    "defaultLength": 28,
+    "periodDuration": 5,
+    "irregularityBuffer": 3,
+    "phases": {
+      "menstrual": {
+        "label": "Menstrual Phase",
+        "shortLabel": "Menstrual",
+        "icon": "🌑",
+        "color": "#f4a0b5",
+        "colorClass": "phase-menstrual",
+        "daysStart": 1,
+        "daysEndFn": "periodDuration",
+        "desc": "Rest & restore. Your body is shedding — honor it. Light movement, warmth, and gentle nourishment are your medicine right now.",
+        "needs": [
+          "Rest & gentle movement",
+          "Warm nourishing foods",
+          "Iron-rich meals",
+          "Heating pad",
+          "Extra sleep",
+          "Skip the guilt"
+        ],
+        "needsByCategory": {
+          "movement": { "intensity": "gentle", "tags": ["Rest & gentle movement", "A slow walk if you feel like moving"] },
+          "recovery": { "tags": ["Heating pad", "Extra sleep", "Iron-rich meals", "Warm nourishing foods"] },
+          "mindset":  { "tags": ["Skip the guilt", "Rest is the work today"] }
+        },
+        "note": "Your body is working overtime right now. The best workout today might be a short walk and an early night. No guilt if you rest."
+      },
+      "follicular": {
+        "label": "Follicular Phase",
+        "shortLabel": "Follicular",
+        "icon": "🌒",
+        "color": "#b39ddb",
+        "colorClass": "phase-follicular",
+        "daysStartFn": "periodDuration+1",
+        "daysEndFraction": 0.43,
+        "desc": "Energy is rising, creativity is blooming. This is your best time to learn something new, start new routines, and push your training forward.",
+        "needs": [
+          "Try something new",
+          "Morning movement if waking early",
+          "Strength training",
+          "Fermented foods",
+          "Social & creative energy",
+          "Set your cycle goals now"
+        ],
+        "needsByCategory": {
+          "movement": { "intensity": "building", "tags": ["Try something new", "Morning movement if waking early", "Strength training"] },
+          "recovery": { "tags": ["Fermented foods"] },
+          "mindset":  { "tags": ["Social & creative energy", "Set your cycle goals now"] }
+        },
+        "note": "Your energy is building — now's the time to schedule the thing you've been putting off. Your body and mind learn fastest in this phase."
+      },
+      "ovulatory": {
+        "label": "Ovulatory Phase",
+        "shortLabel": "Ovulatory",
+        "icon": "🌕",
+        "color": "#f5c842",
+        "colorClass": "phase-ovulatory",
+        "daysStartFraction": 0.43,
+        "daysEndFraction": 0.50,
+        "desc": "Peak power, peak confidence. You are magnetic right now. Push your hardest workouts — your body can handle it and your mind is sharp.",
+        "needs": [
+          "Heavy lifts & HIIT",
+          "Outdoor training",
+          "Peak performance work",
+          "Antioxidant-rich foods",
+          "Social everything",
+          "Hydrate more than usual"
+        ],
+        "needsByCategory": {
+          "movement": { "intensity": "intense", "tags": ["Heavy lifts & HIIT", "Outdoor training", "Peak performance work"] },
+          "recovery": { "tags": ["Antioxidant-rich foods", "Hydrate more than usual"] },
+          "mindset":  { "tags": ["Social everything", "Confidence is at its peak — use it"] }
+        },
+        "note": "This is your window. Whatever you've been hesitating on — do it now. Your body is strong, your mind is clear, and your confidence is at its peak."
+      },
+      "luteal": {
+        "label": "Luteal Phase",
+        "shortLabel": "Luteal",
+        "icon": "🌖",
+        "color": "#7c5cbf",
+        "colorClass": "phase-luteal",
+        "daysStartFraction": 0.50,
+        "daysEndFn": "cycleLength",
+        "desc": "Progesterone is rising — you may feel more inward. Ease up intensity gradually and prioritize recovery this phase.",
+        "needs": [
+          "Omega-3 & magnesium",
+          "Lighter workouts as phase progresses",
+          "Complex carbs (no restriction!)",
+          "Reduce caffeine",
+          "Extra grace for yourself",
+          "Cozy evening wind-down"
+        ],
+        "needsByCategory": {
+          "movement": { "intensity": "tapering", "tags": ["Lighter workouts as phase progresses", "Cozy evening wind-down"] },
+          "recovery": { "tags": ["Omega-3 & magnesium", "Complex carbs (no restriction!)", "Reduce caffeine"] },
+          "mindset":  { "tags": ["Extra grace for yourself"] }
+        },
+        "note": "Honor the slowdown. Your body is preparing. Swap intensity for consistency — gentle lifting, good food, good sleep."
+      }
+    }
+  },
+
+  "hormoneModel": {
+    "enabled": true,
+    "disclaimer": "Modeled from your cycle day — not bloodwork. Use as a guide.",
+    "suppressedBy": null
+  },
+
+  "activity": {
+    "primaryType": "general-fitness",
+    "primaryMovementSuggestions": ["Strength training", "Running", "Swimming", "Yoga", "Dance", "Cycling", "Pole dance"],
+    "primaryMovementByPhase": {
+      "menstrual":  { "recommended": false, "intensity": "light", "note": "Swap full sessions for stretching, floor work, or a walk." },
+      "follicular": { "recommended": true, "intensity": "medium-high", "note": "Great window to build — technique work and progressing your training." },
+      "ovulatory":  { "recommended": true, "intensity": "high", "note": "Peak power and confidence. Push your hardest sessions here." },
+      "luteal":     { "recommended": true, "intensity": "medium", "note": "Dial back impact as the phase progresses. Consistency over intensity." }
+    },
+    "primaryIntellectualSuggestions": ["Deep work / learning", "Writing", "Coding", "Studying", "Creative projects"],
+    "primaryIntellectualByPhase": {
+      "menstrual":  { "recommended": true, "load": "low", "note": "Low-stakes days — review, light admin, or rest your mind along with your body." },
+      "follicular": { "recommended": true, "load": "medium", "note": "Focus is coming online — a good window to learn something new or start a project." },
+      "ovulatory":  { "recommended": true, "load": "high", "note": "Sharpest, most social thinking of the cycle — great for collaboration or performance-heavy work." },
+      "luteal":     { "recommended": true, "load": "medium-low", "note": "Detail-oriented focus shines here — editing, planning, and wrapping up loose threads." }
+    },
+    "schedule": {
+      "AM": { "window": "07:00-09:00", "label": "AM", "defaultType": "yoga-mobility" },
+      "PM": { "window": "17:00-19:00", "label": "PM", "defaultType": "primary" }
+    },
+    "outdoorPreferences": {
+      "enabled": true,
+      "location": "Your City",
+      "lat": 0,
+      "lon": 0,
+      "units": "celsius",
+      "activities": {
+        "morningRun": {
+          "label": "🌅 Early Run",
+          "minTempF": 50,
+          "maxTempF": 90,
+          "avoidWeatherCodes": [51, 61, 71, 95, 96, 99],
+          "bestTimeWindow": "05:30–07:00",
+          "phasesBest": ["follicular", "ovulatory"]
+        },
+        "walk": {
+          "label": "🚶 Walk",
+          "minTempF": 40,
+          "maxTempF": 100,
+          "avoidWeatherCodes": [95, 96, 99],
+          "bestTimeWindow": "06:00–08:00",
+          "phasesBest": ["luteal", "menstrual"]
+        }
+      }
+    },
+    "library": {
+      "menstrual": {
+        "AM": [
+          { "name": "Restorative yoga — hip openers & lower back", "tag": "rest", "icon": "🧘" },
+          { "name": "Light walk (20 min)", "tag": "outdoor", "icon": "🚶" }
+        ],
+        "PM": [
+          { "name": "Rest — watch your comfort show", "tag": "rest", "icon": "🛋️" },
+          { "name": "Gentle stretch", "tag": "rest", "icon": "🧘" }
+        ]
+      },
+      "follicular": {
+        "AM": [
+          { "name": "Energizing vinyasa yoga — build heat", "tag": "strength", "icon": "🧘" },
+          { "name": "Morning run (if waking early & warm)", "tag": "outdoor", "icon": "🏃" }
+        ],
+        "PM": [
+          { "name": "Upper body strength + core", "tag": "strength", "icon": "💪" },
+          { "name": "Try something new — a class or skill you've been curious about", "tag": "strength", "icon": "🎭" }
+        ]
+      },
+      "ovulatory": {
+        "AM": [
+          { "name": "Power yoga or morning run — peak energy", "tag": "strength", "icon": "🏃" }
+        ],
+        "PM": [
+          { "name": "Leg day — HEAVY. Your peak power window.", "tag": "strength", "icon": "💪" },
+          { "name": "HIIT or outdoor workout", "tag": "outdoor", "icon": "🔥" }
+        ]
+      },
+      "luteal": {
+        "AM": [
+          { "name": "Yoga — stretch muscles worked last night", "tag": "rest", "icon": "🧘" }
+        ],
+        "PM": [
+          { "name": "Moderate strength — keep the habit, drop the ego", "tag": "strength", "icon": "💪" }
+        ]
+      }
+    },
+    "cycleFocusOptions": [
+      { "value": "strength",   "label": "💪 Build Strength",          "note": "Heavy lifts are prioritized in follicular & ovulatory. Luteal gets moderate strength. Menstrual gets rest." },
+      { "value": "lean",       "label": "🔥 Lean Out",                "note": "HIIT and cardio are balanced with strength. Food guidance leans toward protein and reduced inflammation." },
+      { "value": "flex",       "label": "🧘 Flexibility & Recovery",  "note": "Yoga sessions are longer and more specific. Recovery is built in every phase." },
+      { "value": "allaround",  "label": "✨ All-Around",              "note": "A balanced approach — strength, flexibility, cardio, and rest are all part of your plan." }
+    ],
+    "defaultCycleFocus": "allaround"
+  },
+
+  "food": {
+    "pattern": "omnivore",
+    "culturalRestrictions": [],
+    "intro": "Eat intuitively — these are phase-matched principles, not a strict meal plan.",
+    "phases": {
+      "menstrual": {
+        "icon": "🌑",
+        "headline": "Iron, warmth & anti-inflammatory",
+        "eat": ["Iron-rich foods (leafy greens, lentils, red meat)", "Ginger tea", "Warming soups & stews", "Omega-3 (salmon, walnuts)"],
+        "limit": ["Excess salt (bloating)", "Alcohol", "Caffeine overload"],
+        "note": "Your iron drops when you bleed. Pair iron-rich foods with vitamin C to boost absorption."
+      },
+      "follicular": {
+        "icon": "🌒",
+        "headline": "Light, fresh & fermented",
+        "eat": ["Fermented foods (kimchi, yogurt, kefir)", "Lean protein (chicken, eggs, tofu)", "Cruciferous veggies", "Complex carbs"],
+        "limit": ["Heavy processed foods", "Excess sugar"],
+        "note": "Estrogen is rising and your gut loves diversity. Good phase for trying new foods and meal prepping."
+      },
+      "ovulatory": {
+        "icon": "🌕",
+        "headline": "Raw, vibrant & high-protein",
+        "eat": ["Raw & lightly cooked veggies", "Fiber", "Antioxidants (berries, bell peppers)", "Hydrating foods"],
+        "limit": ["Excess alcohol", "Heavy meals before workouts"],
+        "note": "Fiber helps clear excess estrogen through the gut. Stay hydrated, especially if training hard."
+      },
+      "luteal": {
+        "icon": "🌖",
+        "headline": "Grounding, complex carbs & magnesium",
+        "eat": ["Omega-3s (salmon, sardines, flax)", "Magnesium (dark chocolate, avocado, bananas)", "Complex carbs — yes, really", "B vitamins"],
+        "limit": ["Caffeine (worsens PMS for most)", "Alcohol", "Refined sugar"],
+        "note": "The carb cravings are real and hormonal — feed them smart. Complex carbs boost serotonin, magnesium reduces cramping."
+      }
+    }
+  },
+
+  "fasting": {
+    "enabled": true,
+    "defaultWindowHours": 16,
+    "goalOptions": [12, 14, 16, 20],
+    "phaseRules": {
+      "menstrual":  { "recommended": false, "maxWindowHours": 12, "badge": "🚫 Skip today",    "reason": "Low hormones + bleeding — protect cortisol. Eat enough." },
+      "follicular": { "recommended": true,  "maxWindowHours": 18, "badge": "✅ Great window",  "reason": "Best insulin sensitivity of your cycle." },
+      "ovulatory":  { "recommended": true,  "maxWindowHours": 16, "badge": "✅ Good window",   "reason": "Good tolerance. Don't fast on your heaviest training days." },
+      "luteal":     { "recommended": false, "maxWindowHours": 14, "badge": "⚠️ Keep it short", "reason": "Progesterone raises cortisol sensitivity. Long fasts worsen PMS." }
+    },
+    "milestones": [
+      { "hours": 4,  "label": "Glycogen depleting",   "bio": "Your body is burning through stored glucose.", "craving": "Drink water with a pinch of sea salt." },
+      { "hours": 8,  "label": "Ketone shift begins",   "bio": "Insulin is dropping — shift toward fat oxidation begins.", "craving": "Black coffee or green tea." },
+      { "hours": 12, "label": "Autophagy warming up", "bio": "Cellular cleanup is starting. Growth hormone is rising.", "craving": "Sparkling water or herbal tea." },
+      { "hours": 16, "label": "Deep fat burn",         "bio": "Full fat-burning mode. Mental clarity peaks here for many people.", "craving": "Break your fast with protein first, then fats, then carbs." },
+      { "hours": 20, "label": "Extended fast",         "bio": "Significant autophagy and metabolic reset.", "craving": "Bone broth or a small protein snack to ease back in." }
+    ]
+  },
+
+  "sexualHealth": {
+    "enabled": false,
+    "mode": null,
+    "onHormonalBC": false,
+    "displayFertilityWindow": false,
+    "disclaimer": "This app is a planning tool, not medical advice. Always consult your provider for reproductive health decisions."
+  },
+
+  "medications": {
+    "logEnabled": false,
+    "items": [],
+    "disclaimer": "Medications and hormone therapies may affect your natural hormone patterns. Phase-based guidance may not fully apply. Always follow your provider's advice."
+  },
+
+  "habits": {
+    "tracked": ["Workout", "Yoga", "Sugar", "Alcohol", "Protein", "Read", "Floss"],
+    "wellness": ["Workout", "Yoga", "Protein", "Read", "Floss"],
+    "limit": ["Sugar", "Alcohol"],
+    "csvFormat": "checkmarks",
+    "heatmapDays": 30,
+    "wellnessTrendDays": 60
+  },
+
+  "wearables": {
+    "provider": "samsung-health",
+    "csvTypes": {
+      "sleep": {
+        "filePattern": "com.samsung.shealth.sleep_combined",
+        "label": "Sleep Data",
+        "icon": "😴",
+        "fields": { "sleepScore": "sleep_score", "physicalRecovery": "physical_recovery", "mentalRecovery": "mental_recovery", "timestamp": "start_time" }
+      },
+      "vitality": {
+        "filePattern": "com.samsung.shealth.vitality_score",
+        "label": "Vitality / Energy Score",
+        "icon": "⚡",
+        "fields": { "energyScore": "total_score", "timestamp": "day_time" }
+      },
+      "stress": {
+        "filePattern": "com.samsung.shealth.stress",
+        "label": "Stress Score",
+        "icon": "🧠",
+        "fields": { "stressScore": "score", "timestamp": "start_time" }
+      },
+      "cycle": {
+        "filePattern": "com.samsung.health.cycle.flow",
+        "label": "Cycle Flow Data",
+        "icon": "🌙",
+        "fields": { "timestamp": "start_time" }
+      }
+    }
+  },
+
+  "integrations": {
+    "clickup": {
+      "enabled": false,
+      "workspaceId": "YOUR_CLICKUP_WORKSPACE_ID",
+      "lists": {
+        "workouts": { "id": "YOUR_LIST_ID", "name": "Workouts", "assigneeId": 0, "status": "planned" },
+        "poleStreams": { "id": "YOUR_LIST_ID", "name": "Streams A", "assigneeId": 0, "status": "idea logged" },
+        "vrStreams": { "id": "YOUR_LIST_ID", "name": "Streams B", "assigneeId": 0, "status": "idea logged" },
+        "coworkStreams": { "id": "YOUR_LIST_ID", "name": "Streams C", "assigneeId": 0, "status": "idea logged" }
+      },
+      "schedule": {
+        "workouts": { "AM": { "startHour": 7, "endHour": 9 }, "PM": { "startHour": 17, "endHour": 19 } },
+        "streams": { "startHour": 18, "endHour": 21 }
+      },
+      "streamRouting": {
+        "menstrual":  { "mon": "cowork", "tue": "cowork", "wed": "cowork", "thu": "cowork", "fri": "cowork", "sat": "cowork", "sun": "cowork" },
+        "follicular": { "mon": "cowork", "tue": "pole",   "wed": "cowork", "thu": "vr",     "fri": "cowork", "sat": "pole",   "sun": "cowork" },
+        "ovulatory":  { "mon": "pole",   "tue": "cowork", "wed": "pole",   "thu": "cowork", "fri": "vr",     "sat": "pole",   "sun": "cowork" },
+        "luteal":     { "mon": "cowork", "tue": "cowork", "wed": "vr",     "thu": "cowork", "fri": "cowork", "sat": "cowork", "sun": "cowork" }
+      }
+    },
+    "weather": {
+      "enabled": true,
+      "provider": "open-meteo",
+      "lat": 0,
+      "lon": 0,
+      "units": "celsius",
+      "locationLabel": "Your City"
+    }
+  },
+
+  "ui": {
+    "tabs": [
+      { "id": "today",    "label": "✨ Today" },
+      { "id": "cycle",    "label": "🌕 My Cycle" },
+      { "id": "nourish",  "label": "🌿 Nourish" },
+      { "id": "insights", "label": "📊 Insights" },
+      { "id": "calendar", "label": "🗓️ Calendar" },
+      { "id": "settings", "label": "⚙️ Settings" }
+    ],
+    "defaultTab": "today",
+    "safetyDisclaimer": "This is a planning dashboard, not a diagnostic tool. Nothing here is medical advice."
+  }
+}
