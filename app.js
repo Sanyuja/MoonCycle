@@ -2170,17 +2170,9 @@ class MoonCycleApp {
     const aboutLogo = document.getElementById('aboutLogo');
     if (aboutLogo && theme.logo) aboutLogo.src = theme.logo;
 
-    // Demo banner — injected once after the header, removed if demo flag is cleared
+    // Legacy full-width demo banner, if still present from an older session — remove it.
     const existing = document.getElementById('demoBanner');
-    if (isDemo && !existing) {
-      const banner = document.createElement('div');
-      banner.id = 'demoBanner';
-      banner.style.cssText = 'background:rgba(212,175,90,0.12);border-bottom:1px solid rgba(212,175,90,0.3);padding:9px 20px;text-align:center;font-size:0.77rem;color:#d4af5a;letter-spacing:0.04em;';
-      banner.innerHTML = '✦ Demo — generic follicular phase shown. Your personal data never leaves your browser.';
-      h.insertAdjacentElement('afterend', banner);
-    } else if (!isDemo && existing) {
-      existing.remove();
-    }
+    if (existing) existing.remove();
   }
 
   _buildTabs(tabs) {
@@ -2221,6 +2213,7 @@ class MoonCycleApp {
 
     banner.className = `phase-banner ${ph.colorClass || ''}`;
     banner.innerHTML = `
+      ${this._isDemo ? `<div class="info-icon phase-info-icon" title="✦ Demo — generic ${ph.label ? ph.label.toLowerCase() : 'phase'} shown. Your personal data never leaves your browser.">ⓘ</div>` : ''}
       <div class="phase-icon" id="phaseIcon">${ph.icon || '🌙'}</div>
       <div class="phase-info">
         <h2 id="phaseName">${ph.label || 'Cycle Planner'}</h2>
