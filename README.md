@@ -1,4 +1,4 @@
-# Lunarly ✦ Rhythm Studio
+# Lunarly
 
 Cycle‑aware planning for women who train, perform, and manage high‑output routines. Lunarly reads your hormonal or energy state, tells you what it means for your body and mind *today*, and schedules your primary movement and intellectual practices on the days they'll actually land — instead of treating every day of the month the same.
 
