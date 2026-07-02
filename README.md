@@ -1,14 +1,14 @@
-# Lunarly ✦ Rhythm Studio
+# Lunarly
 
 Cycle‑aware planning for women who train, perform, and manage high‑output routines. Lunarly reads your hormonal or energy state, tells you what it means for your body and mind *today*, and schedules your primary movement and intellectual practices on the days they'll actually land — instead of treating every day of the month the same.
 
 No app store, no subscription, no login. Your data never leaves your browser.
 
 **At a glance**
-- **Who it's for:** natural-cycle women planning training/work/fasting around their menstrual phase, and menopausal women who want energy-aware planning instead of period tracking
+- **Who it's for:** natural-cycle women planning training/work/fasting around their menstrual phase; menopausal women who want energy-aware planning instead of period tracking
 - **What it does:** reads your phase or logged energy state and reshapes training, food, fasting, and focus guidance around it, day by day
 - **Try it:** live demo at [moon-cycle.vercel.app](https://moon-cycle.vercel.app) — synthetic data, real logic
-- **Build your own:** config-driven — clone an archetype config and plug in your own details, no code changes needed
+- **Build your own:** config-driven — clone an archetype config and plug in your details, no code changes needed
 - **Custom builds:** paid, personalized configs and private deployments available — see [Replicating This for Someone Else](#replicating-this-for-someone-else)
 
 ---
@@ -30,7 +30,7 @@ The live Vercel site is a demo, not my real dashboard.
 1. **No real health data ships.** The two public archetype configs (`config-demo-urban-athlete.json`, `config-menopausal-archetype.json`) contain no real period dates, biometric history, or integration tokens. My real config stays local and gitignored, running only in a private copy of the app on my machine.
 2. **The demo still needs to feel alive.** Each archetype ships a small seed profile — a primary movement and intellectual practice, ~2 weeks of generated health history, and a few habit logs — so a visitor sees a populated dashboard instead of an empty one. A "ⓘ" on the phase card (hover it) flags this as generic, synthetic data.
 
-Everything else — the phase engine, hormone chart, food guide, Insights charts, Settings — is the real logic, just running on synthetic starting data instead of a mockup.
+Everything else — the phase engine, hormone chart, food guide, Insights charts, Settings — is the real logic, just running on generated starting data instead of a mockup.
 
 ---
 
@@ -53,7 +53,7 @@ The public demo ships two example archetypes because they represent two fundamen
 - **Model:** menstrual-phase — days since your last period start drives everything
 - **Includes:** hormone curve chart, phase timeline, IF fasting guide, strength-training-forward activity library
 
-From one input — day of cycle — Lunarly derives which of the four phases you're in (menstrual, follicular, ovulatory, luteal), a modeled hormone curve for estrogen, progesterone, LH, and FSH, and phase-specific guidance for training intensity, food, fasting, and intellectual load. This works because natural hormone cycling is predictable on a roughly repeatable rhythm — that predictability is the whole reason phase-based planning makes sense for this group.
+From one input — day of cycle — Lunarly derives which of the four phases you're in (menstrual, follicular, ovulatory, luteal) and a modeled hormone curve for estrogen, progesterone, LH, and FSH across the whole cycle. From there it generates phase-specific guidance for training intensity, food, fasting, and intellectual load. This works because natural hormone cycling is predictable on a roughly repeatable rhythm — that predictability is the whole reason phase-based planning makes sense for this group.
 
 ### Archetype 2 — Menopause / CycleWise, energy model
 `config-menopausal-archetype.json`
@@ -66,7 +66,7 @@ Modeling this group with cycle-day math would be wrong, not just simplified, sin
 
 The demo persona is a woman in her late 50s in Pune. She's vegetarian with a modest baseline activity level, and singing (riyaz) is her primary intellectual practice. Food guidance leans iron-forward, and the activity library leans bone-density-forward (walking, yoga, light strength work) rather than strength-training-forward. It's meant to show the energy-state *engine* can carry very different lived contexts, not just one generic template.
 
-**Why the split is architectural:** `PhaseEngine.current` dispatches on `config.cycle.type` at runtime, and every downstream module — Today's Guidance, food guide, Insights correlations, Settings — branches the same way. Menopause isn't a variant of the menstrual model with different labels; it's a structurally different data model.
+**Why the split is architectural** *(for developers — non-technical readers can skip this one):* `PhaseEngine.current` dispatches on `config.cycle.type` at runtime, and every downstream module — Today's Guidance, food guide, Insights correlations, Settings — branches the same way. Menopause isn't a variant of the menstrual model with different labels; it's a structurally different data model.
 
 **Not yet modeled:** hormonal birth control and perimenopause both sit in an in-between zone — BC suppresses natural cycling, perimenopause is irregular and not yet predictable enough for phase math. Today, hormonal-BC users are pointed toward the energy-state model instead. Dedicated configs for both are on the roadmap.
 
@@ -88,23 +88,29 @@ The energy-state model follows the same principle, just keyed off logged energy 
 ## What each part of the dashboard is actually doing
 
 **Today** — Phase/energy banner and body stat rings.
+
 - Hormone curve (natural-cycle only) with live estrogen/progesterone/LH/FSH levels and a plain-English "what this means for how you feel" note
 - Sleep/energy/physical/mental rings — real if logged, estimated from recent history otherwise
 - Local weather, a low-energy warning card, and a "what your body needs today" summary
 
 **My Cycle / Energy Log** — Natural-cycle: cycle wheel and phase timeline. Energy-state: daily energy check-in and symptom log.
+
 - These check-ins feed the Today tab's low-energy note and the Insights energy charts
 
 **Nourish** — Food guide by phase or energy state.
+
 - What to lean into, what to reduce, fasting guidance (natural-cycle) or diet-preference-aware guidance (energy-state)
 
 **Insights** — Upload a habits CSV to see streaks and correlations.
+
 - Heatmap shaded by phase or energy state, a phase/energy-correlation chart, and an Energy & Sleep Patterns card
 
 **Calendar** — This week's phase- or energy-matched plan.
+
 - Primary movement and intellectual sessions placed on their best-matched days, a one-click ClickUp push, and a Google Calendar preview (live sync is planned, not yet wired up)
 
 **Settings** — Cycle basics, or energy pattern + top symptoms + diet preferences, depending on archetype.
+
 - Primary movement & intellectual practice definitions, fasting/diet toggles, wearable CSV uploads
 
 ### Primary Movement & Primary Intellectual Practice
@@ -166,7 +172,7 @@ Open **✎ Log today's numbers** under the rings on the Today tab to type in rea
 Export a CSV from your wearable app (Samsung Health today) and upload in Settings for sleep, energy, physical, and stress scores. Uploads merge into your history day-by-day rather than replacing it, so estimates get better over time.
 
 ### Optional: ClickUp sync + Google Calendar preview
-Use the Calendar tab to see your phase- or energy-matched week. Paste a ClickUp API token to push the week's sessions directly into your task list, or hit **Push this week to Google Calendar** to preview what a synced week would look like.
+Use the Calendar tab to see your phase- or energy-matched week. Paste a ClickUp API token to push the week's sessions directly into your task list, or hit **Push this week to Google Calendar** to preview what a synced week would look like (ClickUp requires a token to actually push; Google Calendar is preview-only for now).
 
 ---
 
@@ -209,6 +215,8 @@ Each archetype can define its own:
 - **Needs & notes** — Today's Guidance categories and pep-talk copy
 - **Branding** — app name, tagline, logo, colors, fonts
 
+If you're not a developer, you can stop reading here — the rest of this section is the technical fork flow.
+
 **For developers wanting to fork this themselves**, the technical flow is:
 1. Copy `config-demo-urban-athlete.json` (or `config-menopausal-archetype.json`, whichever model fits) to `config-<yourname>.json` and customize it locally
 2. `config-<yourname>.json` is gitignored by default (`.gitignore`'s `config-*.json` rule) — only the maintained example configs are tracked, so anything identifying stays off GitHub
@@ -228,20 +236,20 @@ Each archetype can define its own:
 
 ## Privacy
 
-Wearable and habits CSVs are parsed entirely client-side and never uploaded anywhere. Period dates, energy check-ins, and API tokens live only in your browser's `localStorage`. The only configs tracked in this repo are the two demo archetypes — real personal configs are gitignored and stay local, and the public demo runs on generated sample data, not anyone's real history.
+Wearable and habits CSVs are parsed entirely client-side and never uploaded anywhere. Period dates, energy check-ins, and API tokens live only in your browser's `localStorage`. The only configs tracked in this repo are the two demo archetypes — real personal configs are gitignored and stay local.
 
 ---
 
 ## Roadmap
 
+**Archetypes**
+- Perimenopause and hormonal birth control configs
+- Postpartum recovery and endurance-athlete profiles
+
 **Integrations**
 - Live Google Calendar sync (Calendar tab currently previews only)
 - More wearable providers — Apple Health, Fitbit, Oura, Whoop — via the same config-driven `csvTypes` structure
 - Live wearable data via native APIs (Health Connect, HealthKit) instead of manual CSV export
-
-**Archetypes**
-- Perimenopause and hormonal birth control configs
-- Postpartum recovery and endurance-athlete profiles
 
 **Insights**
 - Richer phase/energy-correlation visualizations, rolling averages, and period-over-period comparisons
