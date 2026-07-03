@@ -268,9 +268,9 @@ body[data-stars="true"]::before {
 .weather-desc { font-size: 0.85rem; color: var(--text-soft); margin-top: 2px; }
 .weather-detail { font-size: 0.75rem; color: var(--text-soft); margin-top: 8px; }
 .weather-rec { margin-top: 12px; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; line-height: 1.5; }
-.weather-outdoor { background: rgba(128,203,196,0.25); color: #0d3d39; border: 1px solid rgba(128,203,196,0.5); font-weight:500; }
-.weather-indoor  { background: rgba(201,184,232,0.3);  color: #2d1060; border: 1px solid rgba(201,184,232,0.5); font-weight:500; }
-.weather-storm   { background: rgba(80,80,160,0.2);    color: #1a1a5e; border: 1px solid rgba(80,80,160,0.4);   font-weight:500; }
+.weather-outdoor { background: rgba(128,203,196,0.2); color: var(--teal);       border: 1px solid rgba(128,203,196,0.45); font-weight:500; }
+.weather-indoor  { background: rgba(201,184,232,0.2); color: var(--lilac-light); border: 1px solid rgba(201,184,232,0.45); font-weight:500; }
+.weather-storm   { background: rgba(201,184,232,0.2); color: var(--lilac-light); border: 1px solid rgba(201,184,232,0.45); font-weight:500; }
 .weather-forecast { display: flex; gap: 8px; }
 .weather-forecast-day { flex: 1; text-align: center; background: rgba(255,255,255,0.07); border: 1px solid rgba(212,175,90,0.15); border-radius: 10px; padding: 10px 8px; font-size: 0.75rem; }
 .weather-forecast-label { font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text-soft); }
@@ -290,10 +290,10 @@ body[data-stars="true"]::before {
 .hormone-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,184,232,0.18); border-radius: 20px; padding: 5px 12px 5px 10px; }
 .hormone-swatch { width: 16px; height: 3px; border-radius: 2px; flex-shrink: 0; }
 .hormone-level { font-size: 0.62rem; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-soft); }
-.hormone-level.lvl-peak      { background: rgba(245,200,66,0.35); color: #5a4300; }
-.hormone-level.lvl-high      { background: rgba(244,160,181,0.3); color: #5a0a1a; }
-.hormone-level.lvl-moderate  { background: rgba(128,203,196,0.3); color: #0d3d39; }
-.hormone-level.lvl-low       { background: rgba(201,184,232,0.25); color: #3d2d60; }
+.hormone-level.lvl-peak      { background: rgba(245,200,66,0.25); color: var(--gold); }
+.hormone-level.lvl-high      { background: rgba(244,160,181,0.25); color: var(--rose); }
+.hormone-level.lvl-moderate  { background: rgba(128,203,196,0.25); color: var(--teal); }
+.hormone-level.lvl-low       { background: rgba(201,184,232,0.22); color: var(--lilac-light); }
 .hormone-level.lvl-verylow   { background: rgba(255,255,255,0.08); color: var(--text-soft); }
 
 /* ── Need Card ── */
@@ -309,11 +309,11 @@ body[data-stars="true"]::before {
 .guidance-group:first-of-type { margin-top: 4px; }
 .guidance-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--gold-light); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .intensity-badge { font-size: 0.62rem; padding: 2px 9px; border-radius: 8px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
-.intensity-gentle   { background: rgba(201,184,232,0.35); color: #3d2d60; }
-.intensity-moderate { background: rgba(128,203,196,0.35); color: #0d3d39; }
-.intensity-building { background: rgba(245,200,66,0.3);   color: #5a4300; }
-.intensity-intense  { background: rgba(244,160,181,0.35); color: #5a0a1a; }
-.intensity-tapering { background: rgba(124,92,191,0.3);   color: #2d0e70; }
+.intensity-gentle   { background: rgba(201,184,232,0.25); color: var(--lilac-light); }
+.intensity-moderate { background: rgba(128,203,196,0.25); color: var(--teal); }
+.intensity-building { background: rgba(245,200,66,0.25);  color: var(--gold); }
+.intensity-intense  { background: rgba(244,160,181,0.25); color: var(--rose); }
+.intensity-tapering { background: rgba(124,92,191,0.3);   color: var(--lilac-light); }
 
 /* ── Phase Tags ── */
 .phase-tag { display: inline-block; font-size: 0.65rem; padding: 3px 10px; border-radius: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; }
