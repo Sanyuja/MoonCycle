@@ -1188,10 +1188,10 @@ const WeatherHelper = {
     const isNice = temp >= minOutdoor && code <= 3 && current.precipitation < 0.1;
     const isHot  = temp >= hotSummer && code <= 3;
 
-    if (isStorm) return { cls: 'weather-storm',   text: '⛈️ Thunderstorm alert — perfect hot tub & swim night! Stay inside but cozy.' };
-    if (isNice && isHot) return { cls: 'weather-outdoor', text: '🌅 Hot summer morning — hit the riverwalk run early before it gets too hot.' };
+    if (isStorm) return { cls: 'weather-storm',   text: '⛈️ Thunderstorm alert — stay inside and keep it cozy today.' };
+    if (isNice && isHot) return { cls: 'weather-outdoor', text: '🌅 Hot morning ahead — get outside early before it gets too warm.' };
     if (isNice) return { cls: 'weather-outdoor', text: '🌿 Perfect outdoor weather. Walk, jog, or take your workout outside.' };
-    if (isRainy) return { cls: 'weather-indoor', text: '🌧️ Rainy day — indoor strength or pool swim. Hot tub after is chef\'s kiss.' };
+    if (isRainy) return { cls: 'weather-indoor', text: '🌧️ Rainy day — a good day for indoor training instead.' };
     return { cls: 'weather-indoor', text: '🏙️ Indoor training today — gym, studio, pool, or living room.' };
   }
 };
