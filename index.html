@@ -417,10 +417,10 @@ body[data-stars="true"]::before {
 .cycle-wheel-wrap svg, .cycle-wheel-wrap canvas { max-width: 280px; }
 
 /* ── Status Pills ── */
-.status-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; }
-.pill-success { background: rgba(128,203,196,0.3); color: #1a5c58; }
-.pill-warn    { background: rgba(245,200,66,0.3);   color: #7a5a00; }
-.pill-info    { background: rgba(201,184,232,0.3);   color: var(--lilac-deep); }
+.status-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: bold; border: 1px solid transparent; }
+.pill-success { background: rgba(128,203,196,0.2); color: var(--teal); border-color: rgba(128,203,196,0.4); }
+.pill-warn    { background: rgba(212,175,90,0.2);  color: var(--gold); border-color: rgba(212,175,90,0.4); }
+.pill-info    { background: rgba(201,184,232,0.2); color: var(--lilac-light); border-color: rgba(201,184,232,0.4); }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }
